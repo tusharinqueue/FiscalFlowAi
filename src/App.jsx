@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Navbar from './layout/Navbar'
-import PageWrapper from './layout/PageWrapper'
+import Navbar from './components/Navbar'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import TransactionDetail from './pages/TransactionDetail'
@@ -16,7 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <PageWrapper>
+      <div className="page-wrapper">
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
@@ -30,7 +29,7 @@ function App() {
           {/* catch all route for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </PageWrapper>
+      </div>
     </BrowserRouter>
   )
 }
