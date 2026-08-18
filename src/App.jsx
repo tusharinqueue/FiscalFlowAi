@@ -14,9 +14,26 @@ import NotFound from './pages/NotFound'
 
 function App() {
   const [transactions, setTransactions] = useState([])
+  const [groups, setGroups] = useState([])
 
   function addTransaction(t) {
     setTransactions([...transactions, t])
+  }
+
+  function addGroup(g) {
+    setGroups([...groups, g])
+  }
+
+  function addGroupExpense(groupId, expense) {
+    setGroups(groups.map((g) => {
+      if (g.id === groupId) {
+        return {
+          ...g,
+          expenses: [...g.expenses, expense]
+        }
+      }
+      return g
+    }))
   }
 
   return (
@@ -27,8 +44,8 @@ function App() {
           <Route path="/" element={<Dashboard transactions={transactions} />} />
           <Route path="/transactions" element={<Transactions transactions={transactions} addTransaction={addTransaction} />} />
           <Route path="/transactions/:id" element={<TransactionDetail transactions={transactions} />} />
-          <Route path="/groups" element={<Groups />} />
-          <Route path="/groups/:id" element={<GroupDetail />} />
+          <Route path="/groups" element={<Groups groups={groups} addGroup={addGroup} />} />
+          <Route path="/groups/:id" element={<GroupDetail groups={groups} addGroupExpense={addGroupExpense} />} />
           <Route path="/subscriptions" element={<Subscriptions />} />
           <Route path="/subscriptions/:id" element={<SubscriptionDetail />} />
           <Route path="/goals" element={<Goals />} />
