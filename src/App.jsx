@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Dashboard from './pages/Dashboard'
@@ -12,14 +13,20 @@ import GoalDetail from './pages/GoalDetail'
 import NotFound from './pages/NotFound'
 
 function App() {
+  const [transactions, setTransactions] = useState([])
+
+  function addTransaction(t) {
+    setTransactions([...transactions, t])
+  }
+
   return (
     <BrowserRouter>
       <Navbar />
       <div className="page-wrapper">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/transactions/:id" element={<TransactionDetail />} />
+          <Route path="/" element={<Dashboard transactions={transactions} />} />
+          <Route path="/transactions" element={<Transactions transactions={transactions} addTransaction={addTransaction} />} />
+          <Route path="/transactions/:id" element={<TransactionDetail transactions={transactions} />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/groups/:id" element={<GroupDetail />} />
           <Route path="/subscriptions" element={<Subscriptions />} />
