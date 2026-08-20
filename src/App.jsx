@@ -15,6 +15,7 @@ import NotFound from './pages/NotFound'
 function App() {
   const [transactions, setTransactions] = useState([])
   const [groups, setGroups] = useState([])
+  const [subscriptions, setSubscriptions] = useState([])
 
   function addTransaction(t) {
     setTransactions([...transactions, t])
@@ -36,6 +37,10 @@ function App() {
     }))
   }
 
+  function addSubscription(sub) {
+    setSubscriptions([...subscriptions, sub])
+  }
+
   return (
     <BrowserRouter>
       <Navbar />
@@ -46,8 +51,8 @@ function App() {
           <Route path="/transactions/:id" element={<TransactionDetail transactions={transactions} />} />
           <Route path="/groups" element={<Groups groups={groups} addGroup={addGroup} />} />
           <Route path="/groups/:id" element={<GroupDetail groups={groups} addGroupExpense={addGroupExpense} />} />
-          <Route path="/subscriptions" element={<Subscriptions />} />
-          <Route path="/subscriptions/:id" element={<SubscriptionDetail />} />
+          <Route path="/subscriptions" element={<Subscriptions subscriptions={subscriptions} addSubscription={addSubscription} />} />
+          <Route path="/subscriptions/:id" element={<SubscriptionDetail subscriptions={subscriptions} />} />
           <Route path="/goals" element={<Goals />} />
           <Route path="/goals/:id" element={<GoalDetail />} />
           {/* catch all route for 404 */}
