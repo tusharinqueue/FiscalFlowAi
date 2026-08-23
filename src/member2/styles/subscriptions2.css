@@ -1,0 +1,188 @@
+/* =============================================================
+   subscriptions2.css – Subscriptions page styles (Member 2)
+   Uses the unified CSS variables from theme1.css for dark/light mode
+   ============================================================= */
+
+/* ── Page Layout ───────────────────────────────────────────── */
+.m2-subscriptions-page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-bottom: 40px;
+  animation: m2FadeIn 0.3s ease-in;
+}
+
+@keyframes m2FadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Page Header ───────────────────────────────────────────── */
+.m2-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.m2-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.m2-header__title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--m1-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.02em;
+}
+
+.m2-header__icon {
+  font-size: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m2-header__subtitle {
+  font-size: 15px;
+  color: var(--m1-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Primary Action Button (+ Add Subscription) ─────────────── */
+.m2-btn-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, var(--m1-accent) 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--m1-radius-md, 12px);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 18px var(--m1-accent-glow, rgba(124, 58, 237, 0.35));
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.m2-btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px var(--m1-accent-glow, rgba(124, 58, 237, 0.5));
+  opacity: 0.95;
+}
+
+.m2-btn-add:active {
+  transform: translateY(0);
+}
+
+.m2-btn-add__icon {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ── Empty State Card ──────────────────────────────────────── */
+.m2-empty-card {
+  background: var(--m1-bg-card);
+  border: 1px solid var(--m1-border);
+  border-radius: var(--m1-radius-lg, 16px);
+  padding: 60px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--m1-shadow-card, 0 4px 24px rgba(0, 0, 0, 0.2));
+  animation: m2FadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes m2FadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.m2-empty-card__icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 38px;
+  margin-bottom: 4px;
+  animation: m2Pulse 3s ease-in-out infinite;
+}
+
+@keyframes m2Pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.2);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 0 10px rgba(124, 58, 237, 0);
+  }
+}
+
+.m2-empty-card__title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0;
+}
+
+.m2-empty-card__description {
+  font-size: 14px;
+  color: var(--m1-text-secondary);
+  max-width: 440px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.m2-empty-card__btn {
+  margin-top: 8px;
+}
+
+/* ── Responsive adjustments ────────────────────────────────── */
+@media (max-width: 600px) {
+  .m2-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .m2-btn-add {
+    width: 100%;
+  }
+
+  .m2-empty-card {
+    padding: 40px 20px;
+  }
+}
