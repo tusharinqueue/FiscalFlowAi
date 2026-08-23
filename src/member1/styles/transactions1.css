@@ -859,7 +859,8 @@
 
 .m1-navbar__link--active {
   color: var(--m1-accent-light);
-  background: rgba(124, 58, 237, 0.15);
+  font-weight: 600;
+  background: rgba(124, 58, 237, 0.12);
 }
 
 .m1-navbar__right {
@@ -892,5 +893,5 @@
 
 @media (max-width: 600px) {
   .m1-navbar { padding: 0 16px; }
-  .m1-navbar__links { display: none; }
+  .m1-navbar__username { display: none; }
 }

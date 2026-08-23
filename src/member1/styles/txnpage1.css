@@ -1,23 +1,24 @@
 /* ================================================================
    txnpage1.css – Transactions page styles (Member 1)
-   Simple, readable CSS using the theme variables from theme1.css
+   Premium fintech look inspired by Groww / CRED.
+   Depends on theme1.css for CSS variables.
    ================================================================ */
 
-/* ── Page wrapper ──────────────────────────────────── */
+/* ── Page wrapper ─────────────────────────────────────────────── */
 .t1-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding-bottom: 40px;
+  padding-bottom: 48px;
 }
 
-/* ── Page header ───────────────────────────────────── */
+/* ── Page header ──────────────────────────────────────────────── */
 .t1-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .t1-title {
@@ -25,6 +26,7 @@
   font-weight: 700;
   color: var(--m1-text-primary);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .t1-subtitle {
@@ -33,27 +35,31 @@
   margin: 4px 0 0 0;
 }
 
-/* ── Add Transaction button ────────────────────────── */
+/* ── Add Transaction button ───────────────────────────────────── */
 .t1-btn-add {
-  background: linear-gradient(135deg, var(--m1-accent), #5b21b6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--m1-accent);
   color: white;
   border: none;
-  padding: 11px 22px;
+  padding: 12px 22px;
   border-radius: 10px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: opacity 0.15s, transform 0.15s;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 4px 14px var(--m1-accent-glow);
 }
 
 .t1-btn-add:hover {
-  opacity: 0.9;
+  opacity: 0.88;
   transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--m1-accent-glow);
 }
 
-/* ── Summary cards ─────────────────────────────────── */
+/* ── Summary cards ────────────────────────────────────────────── */
 .t1-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -61,39 +67,45 @@
 }
 
 @media (max-width: 900px) { .t1-summary { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 500px) { .t1-summary { grid-template-columns: 1fr; } }
+@media (max-width: 500px) { .t1-summary { grid-template-columns: 1fr 1fr; gap: 10px; } }
 
 .t1-card {
   background: var(--m1-bg-card);
   border: 1px solid var(--m1-border);
-  border-radius: 12px;
-  padding: 18px 20px;
+  border-radius: 14px;
+  padding: 20px 18px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  backdrop-filter: blur(10px);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   opacity: 0;
-  animation: t1FadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: t1FadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .t1-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   box-shadow: var(--m1-shadow-hover);
+  border-color: var(--m1-border-strong);
+}
+
+.t1-card__icon {
+  font-size: 22px;
+  margin-bottom: 2px;
 }
 
 .t1-card__label {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--m1-text-secondary);
+  letter-spacing: 0.08em;
+  color: var(--m1-text-muted);
 }
 
 .t1-card__value {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--m1-text-primary);
+  letter-spacing: -0.02em;
 }
 
 .t1-card--income   .t1-card__value { color: var(--m1-income); }
@@ -101,51 +113,51 @@
 .t1-card--positive .t1-card__value { color: var(--m1-income); }
 .t1-card--negative .t1-card__value { color: var(--m1-expense); }
 
-/* ── Empty state ───────────────────────────────────── */
+/* ── Empty state ──────────────────────────────────────────────── */
 .t1-empty {
   text-align: center;
-  padding: 60px 20px;
+  padding: 64px 24px;
   background: var(--m1-bg-card);
   border: 1px solid var(--m1-border);
-  border-radius: 14px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .t1-empty__icon  { font-size: 52px; }
-.t1-empty__title { font-size: 18px; font-weight: 600; color: var(--m1-text-primary); margin: 0; }
-.t1-empty__sub   { font-size: 14px; color: var(--m1-text-muted); margin: 0; }
+.t1-empty__title { font-size: 18px; font-weight: 700; color: var(--m1-text-primary); margin: 0; }
+.t1-empty__sub   { font-size: 14px; color: var(--m1-text-muted); margin: 0; max-width: 340px; }
 
-/* ── Transaction list container ────────────────────── */
+/* ── Transaction list container ───────────────────────────────── */
 .t1-list {
   display: flex;
   flex-direction: column;
   background: var(--m1-bg-card);
   border: 1px solid var(--m1-border);
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  backdrop-filter: blur(10px);
 }
 
-/* ── Single transaction row ────────────────────────── */
+/* ── Single transaction row ───────────────────────────────────── */
 .t1-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid var(--m1-border);
-  transition: background 0.15s;
   gap: 12px;
+  transition: background 0.15s;
   opacity: 0;
-  animation: t1FadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: t1FadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .t1-item:last-child { border-bottom: none; }
+
 .t1-item:hover { background: var(--m1-bg-card-hover); }
 
-/* Left: icon + info */
+/* Left side: icon + info */
 .t1-item__left {
   display: flex;
   align-items: center;
@@ -154,7 +166,20 @@
   min-width: 0;
 }
 
-.t1-item__icon { font-size: 26px; flex-shrink: 0; }
+/* Category icon bubble */
+.t1-item__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.t1-item--income  .t1-item__icon { background: var(--m1-income-bg); }
+.t1-item--expense .t1-item__icon { background: var(--m1-expense-bg); }
 
 .t1-item__info {
   display: flex;
@@ -164,7 +189,7 @@
 }
 
 .t1-item__title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--m1-text-primary);
   white-space: nowrap;
@@ -172,10 +197,10 @@
   text-overflow: ellipsis;
 }
 
-.t1-item__meta { font-size: 13px; color: var(--m1-text-muted); }
-.t1-item__desc { font-size: 12px; color: var(--m1-text-muted); font-style: italic; }
+.t1-item__meta { font-size: 12px; color: var(--m1-text-muted); }
+.t1-item__desc { font-size: 11px; color: var(--m1-text-muted); font-style: italic; }
 
-/* Right: amount, badge, buttons */
+/* Right side: amount, badge, buttons */
 .t1-item__right {
   display: flex;
   align-items: center;
@@ -184,7 +209,7 @@
 }
 
 .t1-item__amount {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   min-width: 90px;
   text-align: right;
@@ -197,39 +222,41 @@
   font-size: 11px;
   font-weight: 600;
   padding: 3px 10px;
-  border-radius: 20px;
+  border-radius: 999px;
   text-transform: capitalize;
 }
 
 .t1-item__badge--income  { background: var(--m1-income-bg);  color: var(--m1-income); }
 .t1-item__badge--expense { background: var(--m1-expense-bg); color: var(--m1-expense); }
 
-.t1-item__actions { display: flex; gap: 6px; }
+.t1-item__actions { display: flex; gap: 6px; align-items: center; }
 
-/* Edit button */
+/* ── Action buttons ───────────────────────────────────────────── */
 .t1-btn-edit {
-  padding: 6px 14px;
+  padding: 6px 13px;
   background: var(--m1-blue-bg);
   color: var(--m1-blue);
-  border: 1px solid var(--m1-blue);
+  border: 1px solid transparent;
   border-radius: 7px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.t1-btn-edit:hover { background: var(--m1-blue); color: white; }
+.t1-btn-edit:hover {
+  background: var(--m1-blue);
+  color: white;
+}
 
-/* Delete button */
 .t1-btn-delete {
-  padding: 6px 14px;
+  padding: 6px 13px;
   background: var(--m1-expense-bg);
   color: var(--m1-expense);
-  border: 1px solid var(--m1-expense);
+  border: 1px solid transparent;
   border-radius: 7px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -238,12 +265,49 @@
 
 .t1-btn-delete:hover { background: var(--m1-expense); color: white; }
 
-/* ── Modal overlay (dark background) ──────────────── */
+/* ── Delete confirm inline ────────────────────────────────────── */
+.t1-confirm {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.t1-confirm__label {
+  font-size: 12px;
+  color: var(--m1-expense);
+  font-weight: 700;
+  margin-right: 2px;
+}
+
+/* ── Mobile: stack items as cards below 640px ─────────────────── */
+@media (max-width: 640px) {
+  .t1-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .t1-item__right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .t1-item__amount {
+    min-width: auto;
+    text-align: left;
+  }
+
+  .t1-item__badge { display: none; }
+}
+
+/* ── Modal overlay ────────────────────────────────────────────── */
 .t1-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -251,28 +315,35 @@
   padding: 20px;
 }
 
-/* ── Modal box ─────────────────────────────────────── */
+/* ── Modal box ────────────────────────────────────────────────── */
 .t1-modal {
   background: var(--m1-bg-surface);
   border: 1px solid var(--m1-border-strong);
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 28px;
   width: 100%;
   max-width: 480px;
   box-shadow: var(--m1-shadow-modal);
-  animation: t1-slide-in 0.25s ease;
+  animation: t1ModalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-@keyframes t1-slide-in {
-  from { opacity: 0; transform: translateY(-18px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0)    scale(1); }
+@keyframes t1ModalIn {
+  from { opacity: 0; transform: translateY(-16px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Scrollbar inside modal */
+.t1-modal::-webkit-scrollbar { width: 4px; }
+.t1-modal::-webkit-scrollbar-track { background: transparent; }
+.t1-modal::-webkit-scrollbar-thumb { background: var(--m1-border-strong); border-radius: 4px; }
 
 .t1-modal__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 .t1-modal__header h2 {
@@ -280,12 +351,13 @@
   font-weight: 700;
   color: var(--m1-text-primary);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .t1-modal__close {
-  background: none;
-  border: none;
-  font-size: 18px;
+  background: var(--m1-input-bg);
+  border: 1px solid var(--m1-border);
+  font-size: 16px;
   color: var(--m1-text-secondary);
   cursor: pointer;
   width: 32px;
@@ -299,43 +371,46 @@
 
 .t1-modal__close:hover { background: var(--m1-expense-bg); color: var(--m1-expense); }
 
-/* ── Form elements ─────────────────────────────────── */
+/* ── Form fields ──────────────────────────────────────────────── */
 .t1-form-error {
   font-size: 13px;
   color: var(--m1-expense);
   background: var(--m1-expense-bg);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.25);
   padding: 10px 14px;
   border-radius: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .t1-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .t1-field label {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--m1-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .t1-optional {
   font-weight: 400;
   color: var(--m1-text-muted);
-  font-size: 12px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11px;
 }
 
-/* All inputs and selects share the same look */
 .t1-field input,
 .t1-field select {
-  padding: 10px 14px;
+  padding: 11px 14px;
   background: var(--m1-input-bg);
   border: 1.5px solid var(--m1-input-border);
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--m1-text-primary);
   font-size: 14px;
   font-family: inherit;
@@ -346,28 +421,27 @@
 .t1-field input:focus,
 .t1-field select:focus {
   outline: none;
-  border-color: var(--m1-accent);
+  border-color: var(--m1-input-focus);
   box-shadow: 0 0 0 3px var(--m1-accent-glow);
 }
 
 .t1-field input::placeholder { color: var(--m1-text-muted); }
 
 .t1-field select option {
-  background-color: var(--m1-bg-surface, #0f1120);
-  color: var(--m1-text-primary, #e8eaf6);
-  padding: 10px;
+  background-color: var(--m1-bg-surface);
+  color: var(--m1-text-primary);
 }
 
-/* Two fields side by side */
+/* Amount + Date two columns */
 .t1-field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-@media (max-width: 480px) { .t1-field-row { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .t1-field-row { grid-template-columns: 1fr; } }
 
-/* ── Income / Expense type toggle ──────────────────── */
+/* ── Type toggle ──────────────────────────────────────────────── */
 .t1-type-toggle {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -375,9 +449,9 @@
 }
 
 .t1-type-btn {
-  padding: 10px;
-  border-radius: 8px;
-  border: 2px solid var(--m1-border);
+  padding: 11px;
+  border-radius: 9px;
+  border: 1.5px solid var(--m1-border);
   background: var(--m1-input-bg);
   color: var(--m1-text-secondary);
   font-size: 14px;
@@ -387,7 +461,8 @@
   transition: all 0.15s;
 }
 
-/* Active states */
+.t1-type-btn:hover { border-color: var(--m1-border-strong); }
+
 .t1-type-btn--expense {
   background: var(--m1-expense-bg);
   border-color: var(--m1-expense);
@@ -400,53 +475,57 @@
   color: var(--m1-income);
 }
 
-/* ── Form action buttons ───────────────────────────── */
+/* ── Form action buttons ──────────────────────────────────────── */
 .t1-form-actions {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
 .t1-btn-cancel {
   flex: 1;
-  padding: 11px;
+  padding: 12px;
   background: transparent;
   border: 1.5px solid var(--m1-border-strong);
-  border-radius: 8px;
+  border-radius: 9px;
   color: var(--m1-text-secondary);
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.t1-btn-cancel:hover { background: var(--m1-bg-card-hover); }
+.t1-btn-cancel:hover { background: var(--m1-bg-card-hover); border-color: var(--m1-border-strong); }
 
 .t1-btn-submit {
   flex: 2;
-  padding: 11px;
-  background: linear-gradient(135deg, var(--m1-accent), #5b21b6);
+  padding: 12px;
+  background: var(--m1-accent);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 14px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.15s;
-  box-shadow: 0 3px 12px var(--m1-accent-glow);
+  box-shadow: 0 4px 14px var(--m1-accent-glow);
 }
 
-.t1-btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+.t1-btn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+.t1-btn-submit:active { transform: translateY(0); }
 
+/* ── Keyframe ─────────────────────────────────────────────────── */
 @keyframes t1FadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive adjustments ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .t1-modal { padding: 22px 18px; }
+  .t1-title { font-size: 22px; }
+  .t1-card  { padding: 14px 12px; }
+  .t1-card__value { font-size: 17px; }
 }

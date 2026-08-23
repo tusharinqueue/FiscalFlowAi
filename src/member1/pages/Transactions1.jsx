@@ -22,6 +22,17 @@ const EMPTY_FORM = {
   description: ''
 }
 
+// Category icon map – matches what the Dashboard uses
+const CATEGORY_ICONS = {
+  Food: '🍔',
+  Transport: '🚗',
+  Shopping: '🛍️',
+  Entertainment: '🎬',
+  Bills: '📋',
+  Salary: '💼',
+  Other: '📦',
+}
+
 
 export default function Transactions1() {
 
@@ -229,22 +240,26 @@ export default function Transactions1() {
       <div className="t1-summary">
 
         <div className="t1-card" style={{ animationDelay: '0.1s' }}>
+          <span className="t1-card__icon">📊</span>
           <span className="t1-card__label">Total Transactions</span>
           <strong className="t1-card__value">{transactions.length}</strong>
         </div>
 
         <div className="t1-card t1-card--income" style={{ animationDelay: '0.2s' }}>
+          <span className="t1-card__icon">💰</span>
           <span className="t1-card__label">Total Income</span>
           <strong className="t1-card__value">{formatCurrency(totalIncome)}</strong>
         </div>
 
         <div className="t1-card t1-card--expense" style={{ animationDelay: '0.3s' }}>
+          <span className="t1-card__icon">💸</span>
           <span className="t1-card__label">Total Expenses</span>
           <strong className="t1-card__value">{formatCurrency(totalExpense)}</strong>
         </div>
 
         {/* Balance card turns green if positive, red if negative */}
         <div className={`t1-card ${balance >= 0 ? 't1-card--positive' : 't1-card--negative'}`} style={{ animationDelay: '0.4s' }}>
+          <span className="t1-card__icon">{balance >= 0 ? '📈' : '📉'}</span>
           <span className="t1-card__label">Balance</span>
           <strong className="t1-card__value">{formatCurrency(balance)}</strong>
         </div>
@@ -268,10 +283,10 @@ export default function Transactions1() {
           {transactions.map((txn, index) => (
             <div key={txn.id} className={`t1-item t1-item--${txn.type}`} style={{ animationDelay: `${0.1 + index * 0.06}s` }}>
 
-              {/* Left side: icon + title + meta */}
+              {/* Left side: category icon bubble + title + meta */}
               <div className="t1-item__left">
                 <div className="t1-item__icon">
-                  {txn.type === 'income' ? '💰' : '💸'}
+                  {CATEGORY_ICONS[txn.category] || (txn.type === 'income' ? '💰' : '💸')}
                 </div>
                 <div className="t1-item__info">
                   <strong className="t1-item__title">{txn.title}</strong>
