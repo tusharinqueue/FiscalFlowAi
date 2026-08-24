@@ -6,12 +6,19 @@ import DashboardPage1 from './member1/pages/DashboardPage1'
 import TransactionsPage1 from './member1/pages/TransactionsPage1'
 import LoginPage1 from './member1/pages/LoginPage1'
 
+<<<<<<< HEAD
+=======
+// Member 2 imports
+import SubscriptionsPage2 from './member2/pages/SubscriptionsPage2'
+
+>>>>>>> origin/member2
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* Root is now the dedicated login page */}
         <Route path="/" element={<LoginPage1 />} />
+<<<<<<< HEAD
 
         {/* Protected Member 1 routes */}
         <Route path="/member1" element={<Member1Layout />}>
@@ -19,6 +26,19 @@ function App() {
           <Route path="transactions" element={<TransactionsPage1 />} />
         </Route>
 
+=======
+        
+        {/* Protected routes wrapped in shared layout */}
+        <Route path="/member1" element={<Member1Layout />}>
+          <Route index element={<DashboardPage1 />} />
+          <Route path="transactions" element={<TransactionsPage1 />} />
+          <Route path="subscriptions" element={<SubscriptionsPage2 />} />
+        </Route>
+
+        {/* Dedicated direct /subscriptions route */}
+        <Route path="/subscriptions" element={<Navigate to="/member1/subscriptions" replace />} />
+
+>>>>>>> origin/member2
         {/* catch all route for 404 */}
         <Route
           path="*"
