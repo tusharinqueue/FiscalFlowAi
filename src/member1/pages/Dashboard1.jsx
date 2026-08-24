@@ -167,7 +167,7 @@ export default function Dashboard1({ user }) {
           <p className="d1-empty__title">No transactions yet</p>
           <p className="d1-empty__sub">Add your first transaction to see your financial summary.</p>
           {/* Link navigates to the Transactions page */}
-          <Link to="/member1/transactions" className="d1-empty__btn">
+          <Link to="/transactions" className="d1-empty__btn">
             + Add First Transaction
           </Link>
         </div>
@@ -226,7 +226,7 @@ export default function Dashboard1({ user }) {
             <div className="d1-panel__header">
               <h2 className="d1-panel__title">🕐 Recent Transactions</h2>
               {/* "View All" navigates to the Transactions page */}
-              <Link to="/member1/transactions" className="d1-panel__link">
+              <Link to="/transactions" className="d1-panel__link">
                 View All →
               </Link>
             </div>

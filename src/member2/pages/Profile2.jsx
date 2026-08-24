@@ -318,9 +318,10 @@ export default function Profile2() {
         </section>
 
         <section className="m2-profile-card m2-profile-card--summary" id="profile-subscription-summary">
-          <div className="m2-summary-header">
-            <h2 className="m2-summary-title">Subscription Overview</h2>
-            <Link to="/member1/subscriptions" className="m2-summary-link" id="link-manage-subscriptions">
+          <div className="m2-summary-card">
+            <h3 className="m2-summary-title">Active Subscriptions</h3>
+            <span className="m2-summary-value" id="stat-active-subs">{activeSubscriptionsCount}</span>
+            <Link to="/subscriptions" className="m2-summary-link" id="link-manage-subscriptions">
               Manage Subscriptions →
             </Link>
           </div>
@@ -365,7 +366,7 @@ export default function Profile2() {
               </span>
             </div>
 
-            <Link to="/member1/subscriptions" className="m2-btn-go-subs" id="btn-view-all-subs">
+            <Link to="/subscriptions" className="m2-btn-go-subs" id="btn-view-all-subs">
               View All Subscriptions
             </Link>
           </div>

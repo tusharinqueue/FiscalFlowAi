@@ -11,13 +11,13 @@ export default function LoginPage1() {
   useEffect(() => {
     // If the user is already logged in, redirect them immediately to the dashboard
     if (user) {
-      navigate('/member1', { replace: true })
+      navigate('/dashboard', { replace: true })
     }
   }, [user, navigate])
 
   function handleLogin(userData) {
     setUser(userData)
-    // The useEffect will automatically catch the user state change and redirect to /member1
+    // The useEffect will automatically catch the user state change and redirect to /dashboard
   }
 
   // Prevent flashing the login modal if we are about to redirect

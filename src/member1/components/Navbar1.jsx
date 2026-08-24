@@ -16,20 +16,27 @@ export default function Navbar1({ theme, onToggleTheme, user }) {
   return (
     <nav className="m1-navbar" id="m1-navbar">
       {/* Logo */}
-      <Link to="/member1" className="m1-navbar__logo" id="m1-navbar-logo">
+      <Link to="/dashboard" className="m1-navbar__logo" id="m1-navbar-logo">
         <span className="m1-navbar__logo-icon">💸</span>
         FiscalFlow AI
       </Link>
 
-      {/* Nav links */}
       <div className="m1-navbar__links">
-        <Link to="/member1" id="m1-nav-dashboard"
-          className={`m1-navbar__link ${isActive('/member1')}`}>
+        <Link to="/dashboard" id="m1-nav-dashboard"
+          className={`m1-navbar__link ${isActive('/dashboard')}`}>
           Dashboard
         </Link>
-        <Link to="/member1/transactions" id="m1-nav-transactions"
-          className={`m1-navbar__link ${isActive('/member1/transactions')}`}>
+        <Link to="/transactions" id="m1-nav-transactions"
+          className={`m1-navbar__link ${isActive('/transactions')}`}>
           Transactions
+        </Link>
+        <Link to="/subscriptions" id="m1-nav-subscriptions"
+          className={`m1-navbar__link ${isActive('/subscriptions')}`}>
+          Subscriptions
+        </Link>
+        <Link to="/profile" id="m1-nav-profile"
+          className={`m1-navbar__link ${isActive('/profile')}`}>
+          Profile
         </Link>
       </div>
 

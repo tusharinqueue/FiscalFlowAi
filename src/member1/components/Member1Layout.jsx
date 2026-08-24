@@ -18,7 +18,7 @@ export default function Member1Layout() {
 
   // If not logged in, redirect to the dedicated login page
   if (!user) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/login" replace />
   }
 
   return (

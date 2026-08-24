@@ -192,6 +192,14 @@ export default function Subscriptions2() {
       return
     }
 
+    const savedTxnsStr = localStorage.getItem('m1-transactions') || '[]'
+    let savedTxns = []
+    try {
+      savedTxns = JSON.parse(savedTxnsStr)
+    } catch (e) {
+      savedTxns = []
+    }
+
     if (editingId) {
       setSubscriptions(prev =>
         prev.map(sub =>
@@ -210,9 +218,25 @@ export default function Subscriptions2() {
             : sub
         )
       )
+
+      // Update linked transaction
+      const updatedTxns = savedTxns.map(txn => {
+        if (txn.id === `sub-${editingId}`) {
+          return {
+            ...txn,
+            title: `Subscription: ${formData.name.trim()}`,
+            amount: parsedAmount,
+            category: formData.category,
+            date: formData.startDate
+          }
+        }
+        return txn
+      })
+      localStorage.setItem('m1-transactions', JSON.stringify(updatedTxns))
     } else {
+      const newId = Date.now()
       const newSubscription = {
-        id: Date.now(),
+        id: newId,
         name: formData.name.trim(),
         category: formData.category,
         amount: parsedAmount,
@@ -223,6 +247,18 @@ export default function Subscriptions2() {
         status: formData.status
       }
       setSubscriptions(prev => [newSubscription, ...prev])
+
+      // Add linked transaction
+      const newTxn = {
+        id: `sub-${newId}`,
+        title: `Subscription: ${formData.name.trim()}`,
+        amount: parsedAmount,
+        type: 'expense',
+        category: formData.category,
+        date: formData.startDate,
+        description: 'Auto-generated from subscriptions'
+      }
+      localStorage.setItem('m1-transactions', JSON.stringify([newTxn, ...savedTxns]))
     }
 
     handleCloseModal()
@@ -238,6 +274,16 @@ export default function Subscriptions2() {
 
   const handleConfirmDelete = (id) => {
     setSubscriptions(prev => prev.filter(sub => String(sub.id) !== String(id)))
+    
+    const savedTxnsStr = localStorage.getItem('m1-transactions') || '[]'
+    try {
+      const savedTxns = JSON.parse(savedTxnsStr)
+      const updatedTxns = savedTxns.filter(txn => String(txn.id) !== `sub-${id}`)
+      localStorage.setItem('m1-transactions', JSON.stringify(updatedTxns))
+    } catch (e) {
+      // ignore
+    }
+
     setSubscriptionToDelete(null)
   }
 
