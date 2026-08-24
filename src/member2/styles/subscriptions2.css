@@ -139,6 +139,191 @@
   color: var(--m1-text-muted);
 }
 
+.m2-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--m1-bg-card);
+  border: 1px solid var(--m1-border);
+  border-radius: var(--m1-radius-lg, 16px);
+  padding: 18px 20px;
+  box-shadow: var(--m1-shadow-card);
+}
+
+.m2-search-box {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+}
+
+.m2-search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 15px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.m2-search-input {
+  width: 100%;
+  padding: 12px 38px 12px 42px;
+  background: var(--m1-input-bg);
+  border: 1.5px solid var(--m1-input-border);
+  border-radius: var(--m1-radius-md, 12px);
+  color: var(--m1-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.m2-search-input:focus {
+  outline: none;
+  border-color: var(--m1-accent);
+  box-shadow: 0 0 0 3px var(--m1-accent-glow);
+}
+
+.m2-search-input::placeholder {
+  color: var(--m1-text-muted);
+}
+
+.m2-search-clear-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--m1-text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m2-search-clear-btn:hover {
+  color: var(--m1-text-primary);
+}
+
+.m2-filters-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.m2-filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 160px;
+}
+
+.m2-filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--m1-text-secondary);
+}
+
+.m2-filter-select {
+  padding: 10px 14px;
+  background: var(--m1-input-bg);
+  border: 1.5px solid var(--m1-input-border);
+  border-radius: var(--m1-radius-sm, 8px);
+  color: var(--m1-text-primary);
+  font-size: 13.5px;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.m2-filter-select:focus {
+  outline: none;
+  border-color: var(--m1-accent);
+  box-shadow: 0 0 0 3px var(--m1-accent-glow);
+}
+
+.m2-filter-select option {
+  background-color: var(--m1-bg-surface, #0f1120);
+  color: var(--m1-text-primary, #e8eaf6);
+  padding: 10px;
+}
+
+.m2-btn-reset-filters {
+  padding: 10px 16px;
+  background: transparent;
+  border: 1.5px solid var(--m1-border-strong);
+  border-radius: var(--m1-radius-sm, 8px);
+  color: var(--m1-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  height: 41px;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.m2-btn-reset-filters:hover {
+  background: var(--m1-bg-card-hover);
+  color: var(--m1-text-primary);
+}
+
+.m2-empty-search {
+  background: var(--m1-bg-card);
+  border: 1px dashed var(--m1-border-strong);
+  border-radius: var(--m1-radius-lg, 16px);
+  padding: 48px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.m2-empty-search__icon {
+  font-size: 36px;
+  opacity: 0.8;
+}
+
+.m2-empty-search__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0;
+}
+
+.m2-empty-search__desc {
+  font-size: 14px;
+  color: var(--m1-text-secondary);
+  max-width: 400px;
+  margin: 0;
+}
+
+.m2-btn-reset-search {
+  margin-top: 8px;
+  padding: 9px 18px;
+  background: var(--m1-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--m1-radius-sm, 8px);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.m2-btn-reset-search:hover {
+  opacity: 0.9;
+}
+
 .m2-empty-card {
   background: var(--m1-bg-card);
   border: 1px solid var(--m1-border);
@@ -321,6 +506,44 @@
   font-size: 13px;
   color: var(--m1-text-secondary);
   font-weight: 500;
+}
+
+.m2-renewal-alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--m1-radius-sm, 8px);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.m2-renewal-alert--upcoming {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.m2-renewal-alert--urgent {
+  background: rgba(249, 115, 22, 0.18);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.m2-renewal-alert--overdue {
+  background: var(--m1-expense-bg);
+  color: var(--m1-expense);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.m2-renewal-alert--scheduled {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--m1-accent-light, #a78bfa);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.m2-renewal-alert__icon {
+  font-size: 14px;
 }
 
 .m2-sub-card__meta {
@@ -604,6 +827,228 @@
   transform: translateY(-1px);
 }
 
+.m2-renewals-section {
+  background: var(--m1-bg-card);
+  border: 1px solid var(--m1-border);
+  border-radius: var(--m1-radius-lg, 16px);
+  padding: 22px 24px;
+  box-shadow: var(--m1-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.m2-renewals-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.m2-renewals-section__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.m2-renewals-section__subtitle {
+  font-size: 13px;
+  color: var(--m1-text-secondary);
+  margin: 0;
+}
+
+.m2-renewals-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.m2-renewals-empty__icon {
+  font-size: 30px;
+  opacity: 0.7;
+}
+
+.m2-renewals-empty__text {
+  font-size: 14px;
+  color: var(--m1-text-secondary);
+  margin: 0;
+}
+
+.m2-renewals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.m2-renewal-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  background: var(--m1-input-bg);
+  border: 1px solid var(--m1-border);
+  border-radius: var(--m1-radius-md, 12px);
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+
+.m2-renewal-row:hover {
+  border-color: var(--m1-border-strong);
+  transform: translateX(2px);
+}
+
+.m2-renewal-row__name-col {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 2;
+  min-width: 0;
+}
+
+.m2-renewal-row__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.m2-renewal-row__name {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m2-renewal-row__cycle {
+  display: block;
+  font-size: 11px;
+  color: var(--m1-text-muted);
+  margin-top: 2px;
+}
+
+.m2-renewal-row__amount {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  flex: 1;
+  white-space: nowrap;
+}
+
+.m2-renewal-row__date {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1.5;
+}
+
+.m2-renewal-row__date-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--m1-text-muted);
+}
+
+.m2-renewal-row__date-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--m1-text-primary);
+}
+
+.m2-renewal-row__days-col {
+  flex-shrink: 0;
+}
+
+.m2-renewal-days {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: var(--m1-radius-pill, 9999px);
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 54px;
+  text-align: center;
+}
+
+.m2-renewal-days--scheduled {
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--m1-accent-light, #a78bfa);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.m2-renewal-days--upcoming {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.m2-renewal-days--urgent {
+  background: rgba(249, 115, 22, 0.16);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.m2-renewal-days--overdue {
+  background: var(--m1-expense-bg);
+  color: var(--m1-expense);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.m2-renewal-days--unknown {
+  background: var(--m1-input-bg);
+  color: var(--m1-text-muted);
+  border: 1px solid var(--m1-border);
+}
+
+.m2-renewal-row__status-col {
+  flex-shrink: 0;
+}
+
+.m2-renewal-badge {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: var(--m1-radius-pill, 9999px);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.m2-renewal-badge--scheduled {
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--m1-accent-light, #a78bfa);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.m2-renewal-badge--upcoming {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.m2-renewal-badge--urgent {
+  background: rgba(249, 115, 22, 0.16);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.35);
+}
+
+.m2-renewal-badge--overdue {
+  background: var(--m1-expense-bg);
+  color: var(--m1-expense);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.m2-renewal-badge--unknown {
+  background: var(--m1-input-bg);
+  color: var(--m1-text-muted);
+  border: 1px solid var(--m1-border);
+}
+
 @media (max-width: 768px) {
   .m2-stats-grid {
     grid-template-columns: 1fr;
@@ -611,6 +1056,36 @@
 
   .m2-subscriptions-grid {
     grid-template-columns: 1fr;
+  }
+
+  .m2-filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .m2-filter-item {
+    min-width: 100%;
+  }
+
+  .m2-btn-reset-filters {
+    width: 100%;
+  }
+
+  .m2-renewal-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .m2-renewal-row__name-col {
+    flex: 1 1 100%;
+  }
+
+  .m2-renewal-row__date {
+    flex: 1;
+  }
+
+  .m2-renewal-row__amount {
+    flex: 1;
   }
 }
 
