@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import '../styles/theme1.css'
 import '../styles/txnpage1.css'
 
-// ── Constants ─────────────────────────────────────────────────────────────────
+// Constants  
 // The key we use to save/load transactions from localStorage
 const STORAGE_KEY = 'm1-transactions'
 
@@ -36,7 +36,7 @@ const CATEGORY_ICONS = {
 
 export default function Transactions1() {
 
-  // ── State ─────────────────────────────────────────────────────────────────
+  //  State   
 
   // transactions: the main list of all transactions
   const [transactions, setTransactions] = useState([])
@@ -55,7 +55,7 @@ export default function Transactions1() {
   const [error, setError] = useState('')
 
 
-  // ── Load from localStorage on first render ────────────────────────────────
+  //   Load from localStorage on first render   
   // useEffect with [] runs only ONCE when the component first appears on screen.
   // We check if any transactions were saved previously and load them into state.
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function Transactions1() {
   }, []) // empty [] = run only on first render
 
 
-  // ── Save to localStorage whenever transactions changes ─────────────────────
+  //   Save to localStorage whenever transactions changes  
   // useEffect with [transactions] runs every time the transactions array changes.
   // This keeps localStorage always up to date with the latest state.
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function Transactions1() {
   }, [transactions]) // runs whenever transactions changes
 
 
-  // ── Summary calculations ──────────────────────────────────────────────────
+  //   Summary calculations   
   // filter() picks only income transactions, reduce() adds up their amounts
   const totalIncome = transactions
     .filter(t => t.type === 'income')
@@ -89,7 +89,7 @@ export default function Transactions1() {
   const balance = totalIncome - totalExpense
 
 
-  // ── Form change handler ───────────────────────────────────────────────────
+  //   Form change handler   
   // When any input changes, we update just that one field in the form state.
   // e.target.name matches the `name` attribute on the input.
   // e.target.value is what the user typed.
@@ -98,7 +98,7 @@ export default function Transactions1() {
   }
 
 
-  // ── Open the form for ADDING a new transaction ────────────────────────────
+  //   Open the form for ADDING a new transaction   
   function openAddForm() {
     setEditingId(null)         // no transaction being edited
     setForm(EMPTY_FORM)        // clear all form fields
@@ -107,7 +107,7 @@ export default function Transactions1() {
   }
 
 
-  // ── Open the form for EDITING an existing transaction ─────────────────────
+  //   Open the form for EDITING an existing transaction  
   function openEditForm(txn) {
     setEditingId(txn.id)       // remember which transaction we are editing
     setForm({                  // pre-fill the form with the existing values
@@ -123,7 +123,7 @@ export default function Transactions1() {
   }
 
 
-  // ── Close the modal and reset form ────────────────────────────────────────
+  //   Close the modal and reset form  
   function closeModal() {
     setShowModal(false)
     setEditingId(null)
@@ -131,19 +131,19 @@ export default function Transactions1() {
   }
 
 
-  // ── Validate the form before submitting ───────────────────────────────────
+  //   Validate the form before submitting  
   // Returns an error message string if something is wrong, or '' if all good.
   function validateForm() {
-    if (!form.title.trim())              return 'Title is required.'
+    if (!form.title.trim()) return 'Title is required.'
     if (!form.amount || Number(form.amount) <= 0) return 'Amount must be greater than 0.'
-    if (!form.type)                      return 'Please select Income or Expense.'
-    if (!form.category)                  return 'Please select a category.'
-    if (!form.date)                      return 'Please select a date.'
+    if (!form.type) return 'Please select Income or Expense.'
+    if (!form.category) return 'Please select a category.'
+    if (!form.date) return 'Please select a date.'
     return '' // everything is fine
   }
 
 
-  // ── Submit the form (handles both Add and Edit) ───────────────────────────
+  //   Submit the form (handles both Add and Edit)  
   function handleSubmit(e) {
     e.preventDefault() // stop the page from reloading
 
@@ -155,7 +155,7 @@ export default function Transactions1() {
     }
 
     if (editingId) {
-      // ── EDIT MODE: replace the old transaction with updated values ──
+      //   EDIT MODE: replace the old transaction with updated values  
       // map() goes through every transaction. When we find the one with
       // the matching id, we replace it. All others stay the same.
       const updatedList = transactions.map(txn => {
@@ -176,7 +176,7 @@ export default function Transactions1() {
       setTransactions(updatedList)
 
     } else {
-      // ── ADD MODE: create a brand new transaction object ──
+      //   ADD MODE: create a brand new transaction object  
       const newTransaction = {
         id: Date.now().toString(),          // simple unique id using timestamp
         title: form.title.trim(),
@@ -194,7 +194,7 @@ export default function Transactions1() {
   }
 
 
-  // ── Delete a transaction ──────────────────────────────────────────────────
+  //   Delete a transaction  
   // We use a custom state for confirmation because window.confirm() is often
   // blocked by browser preview environments.
   const [itemToDelete, setItemToDelete] = useState(null)
@@ -205,7 +205,7 @@ export default function Transactions1() {
   }
 
 
-  // ── Helper: format a number as Indian Rupees ──────────────────────────────
+  //    Helper: format a number as Indian Rupees  
   function formatCurrency(amount) {
     return '₹' + Number(amount).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
@@ -213,7 +213,7 @@ export default function Transactions1() {
     })
   }
 
-  // ── Helper: format a date string into "23 Aug 2026" ──────────────────────
+  //   Helper: format a date string into "23 Aug 2026"   
   function formatDate(dateStr) {
     return new Date(dateStr).toLocaleDateString('en-IN', {
       day: 'numeric', month: 'short', year: 'numeric'
@@ -221,11 +221,11 @@ export default function Transactions1() {
   }
 
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  //   Render   
   return (
     <div className="t1-page">
 
-      {/* ── Page header ─────────────────────────────── */}
+      {/*Page header*/}
       <div className="t1-header">
         <div>
           <h1 className="t1-title">Transactions</h1>
@@ -236,37 +236,37 @@ export default function Transactions1() {
         </button>
       </div>
 
-      {/* ── Summary cards ───────────────────────────── */}
+      {/*Summary cards */}
       <div className="t1-summary">
 
         <div className="t1-card" style={{ animationDelay: '0.1s' }}>
-          <span className="t1-card__icon">📊</span>
+          <span className="t1-card__icon"></span>
           <span className="t1-card__label">Total Transactions</span>
           <strong className="t1-card__value">{transactions.length}</strong>
         </div>
 
         <div className="t1-card t1-card--income" style={{ animationDelay: '0.2s' }}>
-          <span className="t1-card__icon">💰</span>
+          <span className="t1-card__icon"></span>
           <span className="t1-card__label">Total Income</span>
           <strong className="t1-card__value">{formatCurrency(totalIncome)}</strong>
         </div>
 
         <div className="t1-card t1-card--expense" style={{ animationDelay: '0.3s' }}>
-          <span className="t1-card__icon">💸</span>
+          <span className="t1-card__icon"></span>
           <span className="t1-card__label">Total Expenses</span>
           <strong className="t1-card__value">{formatCurrency(totalExpense)}</strong>
         </div>
 
         {/* Balance card turns green if positive, red if negative */}
         <div className={`t1-card ${balance >= 0 ? 't1-card--positive' : 't1-card--negative'}`} style={{ animationDelay: '0.4s' }}>
-          <span className="t1-card__icon">{balance >= 0 ? '📈' : '📉'}</span>
+          <span className="t1-card__icon"></span>
           <span className="t1-card__label">Balance</span>
           <strong className="t1-card__value">{formatCurrency(balance)}</strong>
         </div>
 
       </div>
 
-      {/* ── Transaction list (or empty state) ───────── */}
+      {/*  Transaction list (or empty state)  */}
       {transactions.length === 0 ? (
 
         /* Show this when there are no transactions */
@@ -348,7 +348,7 @@ export default function Transactions1() {
       )}
 
 
-      {/* ── Add / Edit Modal Form ────────────────────── */}
+      {/*  Add / Edit Modal Form  */}
       {/* showModal controls whether this entire section renders */}
       {showModal && (
         /* Clicking the dark overlay (outside modal) closes it */

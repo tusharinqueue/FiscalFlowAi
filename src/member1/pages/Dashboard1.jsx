@@ -9,12 +9,12 @@ import { Link } from 'react-router-dom'
 import '../styles/theme1.css'
 import '../styles/dash1.css'
 
-// ── Storage key ────────────────────────────────────────────────────────────
+// Storage key 
 // This MUST be the same key used in Transactions1.jsx
 // Both pages read and write to 'm1-transactions' in localStorage
 const STORAGE_KEY = 'm1-transactions'
 
-// ── Category emoji map ─────────────────────────────────────────────────────
+// Category emoji map 
 const CATEGORY_ICONS = {
   Food: '🍔',
   Transport: '🚗',
@@ -25,7 +25,7 @@ const CATEGORY_ICONS = {
   Other: '📦',
 }
 
-// ── Helper: format a number as Indian Rupees ───────────────────────────────
+//  Helper: format a number as Indian Rupees 
 function formatCurrency(amount) {
   return '₹' + Number(amount).toLocaleString('en-IN', {
     minimumFractionDigits: 2,
@@ -33,7 +33,7 @@ function formatCurrency(amount) {
   })
 }
 
-// ── Helper: format a date string into "23 Aug 2026" ───────────────────────
+//  Helper: format a date string into "23 Aug 2026" 
 function formatDate(dateStr) {
   return new Date(dateStr).toLocaleDateString('en-IN', {
     day: 'numeric',
@@ -42,7 +42,7 @@ function formatDate(dateStr) {
   })
 }
 
-// ── Helper: time-based greeting ────────────────────────────────────────────
+// Helper: time-based greeting 
 function getGreeting() {
   const hour = new Date().getHours()
   if (hour < 12) return { text: 'Good Morning', emoji: '☀️' }
@@ -50,7 +50,7 @@ function getGreeting() {
   return { text: 'Good Evening', emoji: '🌙' }
 }
 
-// ── Helper: get today's date in a readable format ─────────────────────────
+//   Helper: get today's date in a readable format 
 function getTodayDate() {
   return new Date().toLocaleDateString('en-IN', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -58,15 +58,15 @@ function getTodayDate() {
 }
 
 
-// ── Main Component ─────────────────────────────────────────────────────────
+// Main Component 
 export default function Dashboard1({ user }) {
 
-  // ── State ─────────────────────────────────────────────────────────────
+  //  State 
   // transactions: holds the array we load from localStorage
   const [transactions, setTransactions] = useState([])
 
 
-  // ── Load from localStorage when page opens ─────────────────────────────
+  // Load from localStorage when page opens 
   // useEffect with [] runs ONCE when the component first appears.
   // We read from localStorage and put the data into our state.
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function Dashboard1({ user }) {
   }, []) // [] = run only on first render
 
 
-  // ── Calculate Total Income ─────────────────────────────────────────────
+  //   Calculate Total Income   
   // Step 1: filter() keeps only income transactions
   // Step 2: reduce() adds up all their amounts starting from 0
   const totalIncome = transactions
@@ -86,25 +86,25 @@ export default function Dashboard1({ user }) {
     .reduce((total, transaction) => total + transaction.amount, 0)
 
 
-  // ── Calculate Total Expenses ───────────────────────────────────────────
+  //   Calculate Total Expenses  
   // Same idea: filter for expense transactions, then add them up
   const totalExpenses = transactions
     .filter(transaction => transaction.type === 'expense')
     .reduce((total, transaction) => total + transaction.amount, 0)
 
 
-  // ── Calculate Total Balance ────────────────────────────────────────────
+  //   Calculate Total Balance  
   // Balance = what you earned minus what you spent
   const totalBalance = totalIncome - totalExpenses
 
 
-  // ── Calculate Savings ─────────────────────────────────────────────────
+  //   Calculate Savings  
   // Savings = how much you kept (0 if you overspent)
   // If balance is negative, you didn't save anything, so savings = 0
   const savings = totalBalance > 0 ? totalBalance : 0
 
 
-  // ── Recent Transactions ────────────────────────────────────────────────
+  //   Recent Transactions  
   // Step 1: [...transactions] makes a copy so we don't change the original
   // Step 2: sort() orders by date, newest first
   // Step 3: slice(0, 5) takes only the first 5
@@ -113,7 +113,7 @@ export default function Dashboard1({ user }) {
     .slice(0, 5)
 
 
-  // ── Category Spending ──────────────────────────────────────────────────
+  //   Category Spending   
   // We want to show how much was spent in each category.
   // Step 1: Start with an empty object {}
   // Step 2: Loop through expense transactions
@@ -140,15 +140,15 @@ export default function Dashboard1({ user }) {
   const todayDate = getTodayDate()
 
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  //   Render   
   return (
     <div className="d1-page">
 
-      {/* ── Greeting Banner ──────────────────────────── */}
+      {/*   Greeting Banner   */}
       <div className="d1-header">
         <div className="d1-header__text">
           <p className="d1-header__greeting">{greeting.text} · Here's your financial overview</p>
-          <h1 className="d1-header__name">Hey, {displayName} 👋</h1>
+          <h1 className="d1-header__name">Hey, {displayName}</h1>
           <p className="d1-header__sub">
             {transactions.length === 0
               ? 'Start by adding your first transaction.'
@@ -174,14 +174,14 @@ export default function Dashboard1({ user }) {
       )}
 
 
-      {/* ── Summary Cards ────────────────────────────── */}
-      {/* We only show these cards when there are transactions */}
+      {/* Summary Cards*/}
+      {/* We only show these cards when there are transactions*/}
       {transactions.length > 0 && (
         <div className="d1-cards">
 
           {/* Card 1: Total Balance */}
           <div className={`d1-card ${totalBalance >= 0 ? 'd1-card--balance-pos' : 'd1-card--balance-neg'}`} style={{ animationDelay: '0.1s' }}>
-            <span className="d1-card__icon">🏦</span>
+            <span className="d1-card__icon"></span>
             <p className="d1-card__label">Total Balance</p>
             <p className="d1-card__value">{formatCurrency(totalBalance)}</p>
             <p className="d1-card__sub">Income − Expenses</p>
@@ -189,7 +189,7 @@ export default function Dashboard1({ user }) {
 
           {/* Card 2: Total Income */}
           <div className="d1-card d1-card--income" style={{ animationDelay: '0.2s' }}>
-            <span className="d1-card__icon">💰</span>
+            <span className="d1-card__icon"></span>
             <p className="d1-card__label">Total Income</p>
             <p className="d1-card__value">{formatCurrency(totalIncome)}</p>
             <p className="d1-card__sub">All income entries</p>
@@ -197,7 +197,7 @@ export default function Dashboard1({ user }) {
 
           {/* Card 3: Total Expenses */}
           <div className="d1-card d1-card--expense" style={{ animationDelay: '0.3s' }}>
-            <span className="d1-card__icon">💸</span>
+            <span className="d1-card__icon"></span>
             <p className="d1-card__label">Total Expenses</p>
             <p className="d1-card__value">{formatCurrency(totalExpenses)}</p>
             <p className="d1-card__sub">All expense entries</p>
@@ -205,7 +205,7 @@ export default function Dashboard1({ user }) {
 
           {/* Card 4: Savings */}
           <div className="d1-card d1-card--savings" style={{ animationDelay: '0.4s' }}>
-            <span className="d1-card__icon">🐷</span>
+            <span className="d1-card__icon"></span>
             <p className="d1-card__label">Savings</p>
             <p className="d1-card__value">{formatCurrency(savings)}</p>
             <p className="d1-card__sub">
@@ -217,15 +217,15 @@ export default function Dashboard1({ user }) {
       )}
 
 
-      {/* ── Bottom section: Recent + Categories ──────── */}
+      {/*Bottom section: Recent + Categories */}
       {transactions.length > 0 && (
         <div className="d1-bottom">
 
-          {/* Left panel: Recent Transactions */}
+          {/*Left panel: Recent Transactions*/}
           <div className="d1-panel">
             <div className="d1-panel__header">
-              <h2 className="d1-panel__title">🕐 Recent Transactions</h2>
-              {/* "View All" navigates to the Transactions page */}
+              <h2 className="d1-panel__title">Recent Transactions</h2>
+              {/*"View All" navigates to the Transactions page*/}
               <Link to="/transactions" className="d1-panel__link">
                 View All →
               </Link>
@@ -235,11 +235,11 @@ export default function Dashboard1({ user }) {
               <p className="d1-panel__empty">No transactions to show.</p>
             ) : (
               <div className="d1-txn-list">
-                {/* map() creates one row for each of the 5 recent transactions */}
+                {/*map() creates one row for each of the 5 recent transactions*/}
                 {recentTransactions.map((txn, index) => (
                   <div key={txn.id} className="d1-txn-row" style={{ animationDelay: `${0.2 + index * 0.08}s` }}>
 
-                    {/* Left: icon bubble + title + meta */}
+                    {/*Left: icon bubble + title + meta*/}
                     <div className="d1-txn-row__left">
                       <div className={`d1-txn-row__icon d1-txn-row__icon--${txn.type}`}>
                         {CATEGORY_ICONS[txn.category] || (txn.type === 'income' ? '💰' : '💸')}
@@ -252,7 +252,7 @@ export default function Dashboard1({ user }) {
                       </div>
                     </div>
 
-                    {/* Right: amount in green or red */}
+                    {/*Right: amount in green or red*/}
                     <span className={`d1-txn-row__amount d1-txn-row__amount--${txn.type}`}>
                       {txn.type === 'income' ? '+' : '−'}{formatCurrency(txn.amount)}
                     </span>
@@ -263,17 +263,17 @@ export default function Dashboard1({ user }) {
             )}
           </div>
 
-          {/* Right panel: Spending by Category */}
+          {/*Right panel: Spending by Category*/}
           <div className="d1-panel">
             <div className="d1-panel__header">
-              <h2 className="d1-panel__title">📂 Spending by Category</h2>
+              <h2 className="d1-panel__title"> Spending by Category</h2>
             </div>
 
             {categoryList.length === 0 ? (
               <p className="d1-panel__empty">No expenses yet.</p>
             ) : (
               <div className="d1-cat-list">
-                {/* map() creates one row per category */}
+                {/*map() creates one row per category*/}
                 {categoryList.map(([category, amount], index) => {
                   // Calculate how wide the progress bar should be (as a %)
                   // The biggest category gets 100%, others are proportional
