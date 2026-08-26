@@ -11,7 +11,7 @@ import SubscriptionsPage2 from './member2/pages/SubscriptionsPage2'
 import ProfilePage2 from './member2/pages/ProfilePage2'
 
 // Member 3 imports
-import SplitwisePage3 from './member3/SplitwisePage'
+import SplitwisePage from './member3/pages/SplitwisePage'
 
 function App() {
   return (
@@ -26,7 +26,7 @@ function App() {
           <Route path="transactions" element={<TransactionsPage1 />} />
           <Route path="subscriptions" element={<SubscriptionsPage2 />} />
           <Route path="profile" element={<ProfilePage2 />} />
-          <Route path="splitwise" element={<SplitwisePage3 />} />
+          <Route path="splitwise" element={<SplitwisePage />} />
         </Route>
 
         {/* Dedicated direct /subscriptions route */}

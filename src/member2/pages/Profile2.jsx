@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLocalStorage2 } from '../hooks/useLocalStorage2'
 import '../../member1/styles/theme1.css'
@@ -25,6 +25,15 @@ const CURRENCY_OPTIONS = [
 export default function Profile2() {
   const [storedUser, setStoredUser] = useLocalStorage2('m1-user', DEFAULT_PROFILE)
   const [subscriptions] = useLocalStorage2('subscriptions', [])
+  const [splitMembers, setSplitMembers] = useState([])
+  const [splitExpenses, setSplitExpenses] = useState([])
+
+  useEffect(() => {
+    const m = localStorage.getItem('m3-members')
+    if (m) setSplitMembers(JSON.parse(m))
+    const e = localStorage.getItem('m3-expenses')
+    if (e) setSplitExpenses(JSON.parse(e))
+  }, [])
 
   const userProfile = {
     ...DEFAULT_PROFILE,
@@ -371,6 +380,35 @@ export default function Profile2() {
             </Link>
           </div>
         </section>
+
+        {splitExpenses.length > 0 && (
+          <section className="m2-profile-card" id="profile-split-summary">
+            <div className="m2-summary-card">
+              <h3 className="m2-summary-title">Split Expenses</h3>
+              <span className="m2-summary-value">{splitExpenses.length}</span>
+              <Link to="/splitwise" className="m2-summary-link">View Split Expenses →</Link>
+            </div>
+            <div className="m2-profile-stats-grid">
+              <div className="m2-profile-stat-box">
+                <span className="m2-profile-stat-label">Group Members</span>
+                <span className="m2-profile-stat-num">{splitMembers.length}</span>
+                <span className="m2-profile-stat-sub">In your group</span>
+              </div>
+              <div className="m2-profile-stat-box">
+                <span className="m2-profile-stat-label">Total Expenses</span>
+                <span className="m2-profile-stat-num">{splitExpenses.length}</span>
+                <span className="m2-profile-stat-sub">Split entries</span>
+              </div>
+              <div className="m2-profile-stat-box">
+                <span className="m2-profile-stat-label">Total Amount</span>
+                <span className="m2-profile-stat-num m2-profile-stat-num--highlight">
+                  ₹{splitExpenses.reduce((s, e) => s + e.amount, 0).toLocaleString('en-IN')}
+                </span>
+                <span className="m2-profile-stat-sub">Group spend</span>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )

@@ -13,6 +13,7 @@ import '../styles/dash1.css'
 // This MUST be the same key used in Transactions1.jsx
 // Both pages read and write to 'm1-transactions' in localStorage
 const STORAGE_KEY = 'm1-transactions'
+const SPLIT_KEY = 'm3-splitwise'
 
 // Category emoji map 
 const CATEGORY_ICONS = {
@@ -61,21 +62,15 @@ function getTodayDate() {
 // Main Component 
 export default function Dashboard1({ user }) {
 
-  //  State 
-  // transactions: holds the array we load from localStorage
   const [transactions, setTransactions] = useState([])
+  const [splitExpenses, setSplitExpenses] = useState([])
 
-
-  // Load from localStorage when page opens 
-  // useEffect with [] runs ONCE when the component first appears.
-  // We read from localStorage and put the data into our state.
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      // JSON.parse converts the saved string back into a JavaScript array
-      setTransactions(JSON.parse(saved))
-    }
-  }, []) // [] = run only on first render
+    if (saved) setTransactions(JSON.parse(saved))
+    const split = localStorage.getItem('m3-expenses')
+    if (split) setSplitExpenses(JSON.parse(split))
+  }, [])
 
 
   //   Calculate Total Income   
@@ -301,6 +296,31 @@ export default function Dashboard1({ user }) {
             )}
           </div>
 
+        </div>
+      )}
+
+      {splitExpenses.length > 0 && (
+        <div className="d1-panel" style={{ marginTop: '20px' }}>
+          <div className="d1-panel__header">
+            <h2 className="d1-panel__title">💸 Split Expenses</h2>
+            <Link to="/splitwise" className="d1-panel__link">View All →</Link>
+          </div>
+          <div className="d1-txn-list">
+            {splitExpenses.slice(0, 3).map(exp => (
+              <div key={exp.id} className="d1-txn-row">
+                <div className="d1-txn-row__left">
+                  <div className="d1-txn-row__icon d1-txn-row__icon--expense">💸</div>
+                  <div className="d1-txn-row__info">
+                    <span className="d1-txn-row__title">{exp.title}</span>
+                    <span className="d1-txn-row__meta">Paid by {exp.paidBy} · {exp.date}</span>
+                  </div>
+                </div>
+                <span className="d1-txn-row__amount d1-txn-row__amount--expense">
+                  ₹{exp.amount.toLocaleString('en-IN')}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
