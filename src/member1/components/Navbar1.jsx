@@ -38,6 +38,10 @@ export default function Navbar1({ theme, onToggleTheme, user }) {
           className={`m1-navbar__link ${isActive('/profile')}`}>
           Profile
         </Link>
+        <Link to="/splitwise" id="m1-nav-splitwise"
+          className={`m1-navbar__link ${isActive('/splitwise')}`}>
+          Split
+        </Link>
       </div>
 
       {/* Right side */}

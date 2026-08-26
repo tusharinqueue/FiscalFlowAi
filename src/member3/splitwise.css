@@ -1,0 +1,17 @@
+.m3-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.m3-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #f0f0f0;
+  margin-bottom: 6px;
+}
+
+.m3-header p {
+  color: #8899bb;
+  font-size: 14px;
+}
