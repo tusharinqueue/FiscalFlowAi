@@ -63,13 +63,16 @@ function getTodayDate() {
 export default function Dashboard1({ user }) {
 
   const [transactions, setTransactions] = useState([])
-  const [splitExpenses, setSplitExpenses] = useState([])
+  const [groups, setGroups] = useState([])
+  const [myName, setMyName] = useState('')
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) setTransactions(JSON.parse(saved))
-    const split = localStorage.getItem('m3-expenses')
-    if (split) setSplitExpenses(JSON.parse(split))
+    const g = localStorage.getItem('m3-groups')
+    if (g) setGroups(JSON.parse(g))
+    const name = localStorage.getItem('m3-myname')
+    if (name) setMyName(name)
   }, [])
 
 
@@ -299,30 +302,68 @@ export default function Dashboard1({ user }) {
         </div>
       )}
 
-      {splitExpenses.length > 0 && (
-        <div className="d1-panel" style={{ marginTop: '20px' }}>
-          <div className="d1-panel__header">
-            <h2 className="d1-panel__title">💸 Split Expenses</h2>
-            <Link to="/splitwise" className="d1-panel__link">View All →</Link>
-          </div>
-          <div className="d1-txn-list">
-            {splitExpenses.slice(0, 3).map(exp => (
-              <div key={exp.id} className="d1-txn-row">
-                <div className="d1-txn-row__left">
-                  <div className="d1-txn-row__icon d1-txn-row__icon--expense">💸</div>
-                  <div className="d1-txn-row__info">
-                    <span className="d1-txn-row__title">{exp.title}</span>
-                    <span className="d1-txn-row__meta">Paid by {exp.paidBy} · {exp.date}</span>
-                  </div>
+      {groups.length > 0 && (() => {
+        const allExpenses = groups.flatMap(g => g.expenses.map(e => ({ ...e, groupName: g.name })))
+        const recent = allExpenses.slice(0, 3)
+
+        let myOwed = 0, myToGet = 0
+        if (myName) {
+          groups.forEach(g => {
+            if (!g.members.includes(myName)) return
+            const bal = {}
+            g.members.forEach(m => bal[m] = 0)
+            g.expenses.forEach(exp => {
+              const share = exp.amount / exp.splitAmong.length
+              exp.splitAmong.forEach(m => {
+                if (m !== exp.paidBy) {
+                  bal[m] = (bal[m] || 0) - share
+                  bal[exp.paidBy] = (bal[exp.paidBy] || 0) + share
+                }
+              })
+            })
+            const myBal = bal[myName] || 0
+            if (myBal > 0) myToGet += myBal
+            else myOwed += Math.abs(myBal)
+          })
+        }
+
+        return (
+          <div className="d1-panel" style={{ marginTop: '20px' }}>
+            <div className="d1-panel__header">
+              <h2 className="d1-panel__title">💸 Split Expenses</h2>
+              <Link to="/splitwise" className="d1-panel__link">View All →</Link>
+            </div>
+            {myName && (myOwed > 0 || myToGet > 0) && (
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                <div style={{ flex: 1, padding: '10px 14px', background: 'rgba(248,113,113,0.1)', borderRadius: '8px', border: '1px solid var(--m1-border)' }}>
+                  <p style={{ fontSize: '11px', color: 'var(--m1-text-secondary)', margin: '0 0 2px' }}>You owe</p>
+                  <p style={{ fontSize: '16px', fontWeight: '700', color: '#f87171', margin: 0 }}>₹{myOwed.toFixed(2)}</p>
                 </div>
-                <span className="d1-txn-row__amount d1-txn-row__amount--expense">
-                  ₹{exp.amount.toLocaleString('en-IN')}
-                </span>
+                <div style={{ flex: 1, padding: '10px 14px', background: 'rgba(52,211,153,0.1)', borderRadius: '8px', border: '1px solid var(--m1-border)' }}>
+                  <p style={{ fontSize: '11px', color: 'var(--m1-text-secondary)', margin: '0 0 2px' }}>You get back</p>
+                  <p style={{ fontSize: '16px', fontWeight: '700', color: '#34d399', margin: 0 }}>₹{myToGet.toFixed(2)}</p>
+                </div>
               </div>
-            ))}
+            )}
+            <div className="d1-txn-list">
+              {recent.map(exp => (
+                <div key={exp.id} className="d1-txn-row">
+                  <div className="d1-txn-row__left">
+                    <div className="d1-txn-row__icon d1-txn-row__icon--expense">💸</div>
+                    <div className="d1-txn-row__info">
+                      <span className="d1-txn-row__title">{exp.title}</span>
+                      <span className="d1-txn-row__meta">{exp.groupName} · Paid by {exp.paidBy}</span>
+                    </div>
+                  </div>
+                  <span className="d1-txn-row__amount d1-txn-row__amount--expense">
+                    ₹{exp.amount.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
     </div>
   )

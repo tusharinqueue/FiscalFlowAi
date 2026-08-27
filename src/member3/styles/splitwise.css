@@ -14,7 +14,7 @@
 .m3-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -30,7 +30,49 @@
 .m3-header p {
   font-size: 15px;
   color: var(--m1-text-secondary);
-  margin: 0;
+  margin: 4px 0 0 0;
+}
+
+.m3-back-btn {
+  background: none;
+  border: none;
+  color: var(--m1-accent-light, #a78bfa);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 6px;
+  font-family: inherit;
+}
+
+.m3-back-btn:hover {
+  opacity: 0.8;
+}
+
+.m3-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--m1-border);
+  padding-bottom: 0;
+}
+
+.m3-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--m1-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.m3-tab--active {
+  color: var(--m1-accent-light, #a78bfa);
+  border-bottom-color: var(--m1-accent-light, #a78bfa);
 }
 
 .m3-section {
@@ -48,10 +90,69 @@
   margin: 0 0 16px 0;
 }
 
+.m3-empty p {
+  color: var(--m1-text-secondary);
+  font-size: 14px;
+  text-align: center;
+  margin: 0;
+}
+
 .m3-error {
   color: var(--m1-expense, #f87171);
   font-size: 13px;
   margin-bottom: 10px;
+}
+
+.m3-group-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.m3-group-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--m1-input-bg);
+  border: 1px solid var(--m1-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.m3-group-card:hover {
+  border-color: var(--m1-accent-light, #a78bfa);
+  transform: translateY(-1px);
+}
+
+.m3-group-card__left {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.m3-group-card__name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+}
+
+.m3-group-card__meta {
+  font-size: 12px;
+  color: var(--m1-text-secondary);
+}
+
+.m3-group-card__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.m3-group-card__total {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--m1-accent-light, #a78bfa);
 }
 
 .m3-form {
@@ -116,9 +217,7 @@
   cursor: pointer;
 }
 
-.m3-btn-add:hover {
-  opacity: 0.9;
-}
+.m3-btn-add:hover { opacity: 0.9; }
 
 .m3-expense-list {
   display: flex;
@@ -181,15 +280,84 @@
   font-size: 14px;
 }
 
-.m3-settlement:last-child {
-  border-bottom: none;
-}
+.m3-settlement:last-child { border-bottom: none; }
 
-.m3-arrow {
-  color: var(--m1-text-secondary);
-}
+.m3-arrow { color: var(--m1-text-secondary); }
 
 .m3-owe-amount {
   font-weight: 700;
   color: var(--m1-text-primary);
+}
+
+.m3-me-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.m3-me-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.m3-me-header h2 {
+  margin-bottom: 0 !important;
+}
+
+.m3-change-name {
+  background: none;
+  border: 1px solid var(--m1-border);
+  color: var(--m1-text-secondary);
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.m3-me-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.m3-me-card {
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--m1-border);
+}
+
+.m3-me-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--m1-text-secondary);
+}
+
+.m3-me-card__value {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.m3-me-card--owed {
+  background: var(--m1-expense-bg, rgba(248,113,113,0.1));
+}
+
+.m3-me-card--owed .m3-me-card__value {
+  color: var(--m1-expense, #f87171);
+}
+
+.m3-me-card--get {
+  background: var(--m1-income-bg, rgba(52,211,153,0.1));
+}
+
+.m3-me-card--get .m3-me-card__value {
+  color: var(--m1-income, #34d399);
 }
