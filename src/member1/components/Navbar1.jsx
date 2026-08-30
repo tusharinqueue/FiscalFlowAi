@@ -38,6 +38,10 @@ export default function Navbar1({ theme, onToggleTheme, user }) {
           className={`m1-navbar__link ${isActive('/profile')}`}>
           Profile
         </Link>
+        <Link to="/goals" id="m1-nav-goals"
+          className={`m1-navbar__link ${isActive('/goals')}`}>
+          Goals
+        </Link>
       </div>
 
       {/* Right side */}

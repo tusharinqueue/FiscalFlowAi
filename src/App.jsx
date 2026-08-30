@@ -10,6 +10,9 @@ import LoginPage1 from './member1/pages/LoginPage1'
 import SubscriptionsPage2 from './member2/pages/SubscriptionsPage2'
 import ProfilePage2 from './member2/pages/ProfilePage2'
 
+import GoalsPage4 from './member4/pages/GoalsPage4'
+import GoalDetailsPage4 from './member4/pages/GoalDetailsPage4'
+
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +26,8 @@ function App() {
           <Route path="transactions" element={<TransactionsPage1 />} />
           <Route path="subscriptions" element={<SubscriptionsPage2 />} />
           <Route path="profile" element={<ProfilePage2 />} />
+          <Route path="goals" element={<GoalsPage4 />} />
+          <Route path="goals/:id" element={<GoalDetailsPage4 />} />
         </Route>
 
         {/* Dedicated direct /subscriptions route */}
