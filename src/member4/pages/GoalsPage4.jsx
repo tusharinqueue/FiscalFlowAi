@@ -13,6 +13,8 @@ export default function GoalsPage4() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newGoal, setNewGoal] = useState({ title: '', icon: '🎯', target: '', timeframeValue: '', timeframeUnit: 'years' })
 
+  const formatMoney = (amt) => '$' + Number(amt).toLocaleString()
+  
   const totalSaved = goals.reduce((acc, g) => acc + Number(g.current), 0)
   const totalTarget = goals.reduce((acc, g) => acc + Number(g.target), 0)
   const goalsCompleted = goals.filter(g => Number(g.current) >= Number(g.target)).length
@@ -48,27 +50,23 @@ export default function GoalsPage4() {
       return pmt > 0 ? pmt : 0
     }
 
-    const fdPmt = calculatePmt(0.065)
-    const mfPmt = calculatePmt(0.12)
-    const stockPmt = calculatePmt(0.18)
-
     return (
       <div className="preview-investments">
         <h4 style={{marginBottom: '10px', color: '#8899bb', fontSize: '13px', textTransform: 'uppercase'}}>
-          To reach ${fvTarget.toLocaleString()} in {newGoal.timeframeValue} {newGoal.timeframeUnit}, invest monthly:
+          To reach {formatMoney(fvTarget)} in {newGoal.timeframeValue} {newGoal.timeframeUnit}, invest monthly:
         </h4>
         <div className="preview-grid">
           <div className="preview-card">
             <div className="preview-title">Fixed Deposits</div>
-            <div className="preview-value">${fdPmt.toFixed(0)}</div>
+            <div className="preview-value">{formatMoney(calculatePmt(0.065).toFixed(0))}</div>
           </div>
           <div className="preview-card">
             <div className="preview-title">Mutual Funds</div>
-            <div className="preview-value">${mfPmt.toFixed(0)}</div>
+            <div className="preview-value">{formatMoney(calculatePmt(0.12).toFixed(0))}</div>
           </div>
           <div className="preview-card">
             <div className="preview-title">Stocks / IPOs</div>
-            <div className="preview-value">${stockPmt.toFixed(0)}</div>
+            <div className="preview-value">{formatMoney(calculatePmt(0.18).toFixed(0))}</div>
           </div>
         </div>
       </div>

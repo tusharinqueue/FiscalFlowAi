@@ -20,6 +20,8 @@ export default function GoalDetailsPage4() {
     }
   }, [id, goals])
 
+  const formatMoney = (amt) => '$' + Number(amt).toLocaleString()
+
   const percent = goal ? Math.min((goal.current / goal.target) * 100, 100) : 0
   const remaining = goal ? Math.max(goal.target - goal.current, 0) : 0
   const isCompleted = percent >= 100
@@ -128,15 +130,15 @@ export default function GoalDetailsPage4() {
           <div className="goal-stat-group">
             <div className="goal-stat-box">
               <div className="stat-label">Current Balance</div>
-              <div className="stat-value highlight">${Number(goal.current).toLocaleString()}</div>
+              <div className="stat-value highlight">{formatMoney(goal.current)}</div>
             </div>
             <div className="goal-stat-box">
               <div className="stat-label">Target Goal</div>
-              <div className="stat-value">${Number(goal.target).toLocaleString()}</div>
+              <div className="stat-value">{formatMoney(goal.target)}</div>
             </div>
             <div className="goal-stat-box">
               <div className="stat-label">Remaining to Save</div>
-              <div className="stat-value" style={{color: '#f87171'}}>${remaining.toLocaleString()}</div>
+              <div className="stat-value" style={{color: '#f87171'}}>{formatMoney(remaining)}</div>
             </div>
             <div className="goal-stat-box">
               <div className="stat-label">Time Horizon</div>
