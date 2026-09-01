@@ -327,6 +327,11 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.inv-card:hover {
+  transform: translateY(-2px);
+  border-color: #4f46e5;
 }
 .inv-card-title {
   font-weight: 600;
@@ -397,6 +402,11 @@
   border-radius: 6px;
   border: 1px solid #2a3555;
   text-align: center;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.preview-card:hover {
+  transform: translateY(-2px);
+  border-color: #34d399;
 }
 .preview-title {
   font-size: 11px;
