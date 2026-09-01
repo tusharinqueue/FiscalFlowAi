@@ -10,8 +10,9 @@ export default function GoalsPage4() {
     { id: 3, title: 'New Car Downpayment', icon: '🚗', current: 5000, target: 15000, timeframeValue: '3', timeframeUnit: 'years', history: [] }
   ])
 
+  const initialGoalForm = { title: '', icon: '🎯', target: '', timeframeValue: '', timeframeUnit: 'years' }
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [newGoal, setNewGoal] = useState({ title: '', icon: '🎯', target: '', timeframeValue: '', timeframeUnit: 'years' })
+  const [newGoal, setNewGoal] = useState(initialGoalForm)
 
   const formatMoney = (amt) => '$' + Number(amt).toLocaleString()
   
@@ -34,7 +35,7 @@ export default function GoalsPage4() {
     }
     setGoals([...goals, goal])
     setIsModalOpen(false)
-    setNewGoal({ title: '', icon: '🎯', target: '', timeframeValue: '', timeframeUnit: 'years' })
+    setNewGoal(initialGoalForm)
   }
 
   const renderInvestmentPreview = () => {
