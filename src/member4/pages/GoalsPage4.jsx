@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useLocalStorage1 } from '../../member1/hooks/useLocalStorage1'
+import { useLocalStorage4 } from '../hooks/useLocalStorage4'
 import '../styles/goals4.css'
 
 export default function GoalsPage4() {
-  const [goals, setGoals] = useLocalStorage1('m4-goals', [
+  const [goals, setGoals] = useLocalStorage4('m4-goals', [
     { id: 1, title: 'Emergency Fund', icon: '🏦', current: 1500, target: 5000, timeframeValue: '2', timeframeUnit: 'years', history: [] },
     { id: 2, title: 'Summer Vacation', icon: '✈️', current: 800, target: 2000, timeframeValue: '6', timeframeUnit: 'months', history: [] },
     { id: 3, title: 'New Car Downpayment', icon: '🚗', current: 5000, target: 15000, timeframeValue: '3', timeframeUnit: 'years', history: [] }

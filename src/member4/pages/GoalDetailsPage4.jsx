@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useLocalStorage1 } from '../../member1/hooks/useLocalStorage1'
+import { useLocalStorage4 } from '../hooks/useLocalStorage4'
+import { useInvestment4 } from '../hooks/useInvestment4'
 import '../styles/goals4.css'
 
 export default function GoalDetailsPage4() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [goals, setGoals] = useLocalStorage1('m4-goals', [])
+  const [goals, setGoals] = useLocalStorage4('m4-goals', [])
   const [goal, setGoal] = useState(null)
   const [depositAmount, setDepositAmount] = useState('')
-
-  const [invData, setInvData] = useState(null)
-  const [loadingApi, setLoadingApi] = useState(false)
 
   useEffect(() => {
     const found = goals.find(g => g.id === parseInt(id))
@@ -38,20 +36,7 @@ export default function GoalDetailsPage4() {
   }
 
   const monthsRemaining = getMonthsRemaining(goal)
-
-  useEffect(() => {
-    if (goal && !isCompleted && monthsRemaining > 0 && !invData && !loadingApi) {
-      setLoadingApi(true)
-      setTimeout(() => {
-        setInvData([
-          { name: 'Fixed Deposits', type: 'low', rate: 0.065, displayRate: '6.5%' },
-          { name: 'Mutual Funds', type: 'medium', rate: 0.12, displayRate: '12.0%' },
-          { name: 'Stocks / IPOs', type: 'high', rate: 0.18, displayRate: '18.0%' }
-        ])
-        setLoadingApi(false)
-      }, 1500)
-    }
-  }, [goal, isCompleted, monthsRemaining, invData, loadingApi])
+  const { invData, loadingApi, calculateRequiredMonthly, calculateTotalReturn } = useInvestment4(goal, monthsRemaining, isCompleted)
 
   if (!goal) return <div className="goals-container" style={{paddingTop: '50px', textAlign: 'center'}}>Goal not found.</div>
 
@@ -84,30 +69,6 @@ export default function GoalDetailsPage4() {
       setGoals(updatedGoals)
       navigate('/goals')
     }
-  }
-
-  const calculateRequiredMonthly = (annualRate) => {
-    if (monthsRemaining <= 0) return 0
-    const r = annualRate / 12
-    const pv = Number(goal.current)
-    const fvTarget = Number(goal.target)
-    
-    const fvOfPv = pv * Math.pow(1 + r, monthsRemaining)
-    const remainingFv = fvTarget - fvOfPv
-    
-    if (remainingFv <= 0) return 0
-    
-    const pmt = (remainingFv * r) / (Math.pow(1 + r, monthsRemaining) - 1)
-    return pmt
-  }
-
-  const calculateTotalReturn = (monthlyPmt, annualRate) => {
-    const totalInvested = monthlyPmt * monthsRemaining
-    const pv = Number(goal.current)
-    const totalPrincipal = pv + totalInvested
-    const target = Number(goal.target)
-    const returns = target - totalPrincipal
-    return returns > 0 ? returns : 0
   }
 
   let timeDisplay = goal.timeframeValue 
@@ -182,7 +143,7 @@ export default function GoalDetailsPage4() {
                   <div className="investment-cards">
                     {invData.map((inv, idx) => {
                       const monthlyPmt = calculateRequiredMonthly(inv.rate)
-                      const totalReturns = calculateTotalReturn(monthlyPmt, inv.rate)
+                      const totalReturns = calculateTotalReturn(monthlyPmt)
                       
                       return (
                         <div key={idx} className="inv-card">
