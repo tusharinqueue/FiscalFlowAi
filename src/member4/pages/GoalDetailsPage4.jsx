@@ -177,7 +177,7 @@ export default function GoalDetailsPage4() {
               {!loadingApi && invData && (
                 <>
                   <p style={{color: '#8899bb', fontSize: '14px', marginBottom: '20px'}}>
-                    Based on market APIs, here is what you need to invest monthly to reach your remaining ${remaining.toLocaleString()} in {monthsRemaining} months.
+                    Based on market APIs, here is what you need to invest monthly to reach your remaining {formatMoney(remaining)} in {monthsRemaining} months.
                   </p>
                   <div className="investment-cards">
                     {invData.map((inv, idx) => {
@@ -194,11 +194,11 @@ export default function GoalDetailsPage4() {
                           
                           <div className="inv-detail">
                             <span>Monthly SIP:</span>
-                            <span>${monthlyPmt.toFixed(0)}</span>
+                            <span>{formatMoney(monthlyPmt.toFixed(0))}</span>
                           </div>
                           <div className="inv-detail">
                             <span>Est. Returns:</span>
-                            <span style={{color: '#34d399'}}>+${totalReturns.toFixed(0)}</span>
+                            <span style={{color: '#34d399'}}>+{formatMoney(totalReturns.toFixed(0))}</span>
                           </div>
                         </div>
                       )
@@ -237,7 +237,7 @@ export default function GoalDetailsPage4() {
                 {goal.history.slice(0, 5).map((entry, idx) => (
                   <div key={idx} className="history-item">
                     <span className="history-date">{entry.date}</span>
-                    <span className="history-amount">+${entry.amount}</span>
+                    <span className="history-amount">+{formatMoney(entry.amount)}</span>
                   </div>
                 ))}
               </div>
