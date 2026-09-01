@@ -85,11 +85,11 @@ export default function GoalsPage4() {
       <div className="goals-summary">
         <div className="summary-card">
           <div className="summary-title">Total Saved</div>
-          <div className="summary-value">${totalSaved.toLocaleString()}</div>
+          <div className="summary-value">{formatMoney(totalSaved)}</div>
         </div>
         <div className="summary-card">
           <div className="summary-title">Total Target</div>
-          <div className="summary-value" style={{color: '#f0f0f0'}}>${totalTarget.toLocaleString()}</div>
+          <div className="summary-value" style={{color: '#f0f0f0'}}>{formatMoney(totalTarget)}</div>
         </div>
         <div className="summary-card">
           <div className="summary-title">Goals Completed</div>
@@ -120,8 +120,8 @@ export default function GoalsPage4() {
                 </div>
                 
                 <div className="goal-progress-text">
-                  <span>${Number(goal.current).toLocaleString()}</span>
-                  <span>${Number(goal.target).toLocaleString()}</span>
+                  <span>{formatMoney(goal.current)}</span>
+                  <span>{formatMoney(goal.target)}</span>
                 </div>
                 
                 <div className="goal-progress-bar-bg">
