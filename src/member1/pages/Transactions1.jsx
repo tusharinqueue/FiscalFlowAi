@@ -1,6 +1,4 @@
-vidushi @fedora: /run/media / vidushi / New Volume / FiscalFlowAi 2nd phase$ git switch -c member1
-Switched to a new branch 'member1'
-vidushi @fedora: /run/media / vidushi / New Volume / FiscalFlowAi 2nd phase$ // Transactions1.jsx – Full Transactions page for FiscalFlow AI (Member 1)
+// Transactions1.jsx – Full Transactions page for FiscalFlow AI (Member 1)
 // All logic is in this one file: Add, Edit, Delete, localStorage, validation
 
 import { useState, useEffect } from 'react'
