@@ -1,9 +1,19 @@
-// Transactions1.jsx – Full Transactions page for FiscalFlow AI (Member 1)
+vidushi @fedora: /run/media / vidushi / New Volume / FiscalFlowAi 2nd phase$ git switch -c member1
+Switched to a new branch 'member1'
+vidushi @fedora: /run/media / vidushi / New Volume / FiscalFlowAi 2nd phase$ // Transactions1.jsx – Full Transactions page for FiscalFlow AI (Member 1)
 // All logic is in this one file: Add, Edit, Delete, localStorage, validation
 
 import { useState, useEffect } from 'react'
 import '../styles/theme1.css'
 import '../styles/txnpage1.css'
+
+// Sort options available in the dropdown
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'highest', label: 'Highest amount' },
+  { value: 'lowest', label: 'Lowest amount' },
+]
 
 // Constants  
 // The key we use to save/load transactions from localStorage
@@ -54,6 +64,16 @@ export default function Transactions1() {
   // error: a validation error message shown inside the form
   const [error, setError] = useState('')
 
+  // ── Search / Filter / Sort state ─────────────────────────────
+  // searchQuery: what the user has typed in the search bar
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // typeFilter: which type to show – 'all' | 'income' | 'expense'
+  const [typeFilter, setTypeFilter] = useState('all')
+
+  // sortOrder: how to order the visible rows
+  const [sortOrder, setSortOrder] = useState('newest')
+
 
   //   Load from localStorage on first render   
   // useEffect with [] runs only ONCE when the component first appears on screen.
@@ -87,6 +107,36 @@ export default function Transactions1() {
 
   // Balance = income minus expenses
   const balance = totalIncome - totalExpense
+
+  // ── Derived: filtered + sorted transactions ───────────────────
+  // We NEVER store these in state – they are computed fresh on every render.
+  // This means Add / Edit / Delete always operate on the real `transactions`
+  // array and the summary cards always reflect the full dataset.
+
+  const displayedTransactions = transactions
+    // 1. filter by type
+    .filter(txn => typeFilter === 'all' || txn.type === typeFilter)
+    // 2. filter by search query (case-insensitive, trimmed)
+    .filter(txn => txn.title.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+    // 3. sort – we spread into a new array first so we never mutate React state
+    .slice()  // copy so .sort() doesn't touch the original
+    .sort((a, b) => {
+      if (sortOrder === 'newest') return new Date(b.date) - new Date(a.date)
+      if (sortOrder === 'oldest') return new Date(a.date) - new Date(b.date)
+      if (sortOrder === 'highest') return b.amount - a.amount
+      if (sortOrder === 'lowest') return a.amount - b.amount
+      return 0
+    })
+
+  // True when the user has typed something or selected a filter
+  const hasActiveFilters = searchQuery.trim() !== '' || typeFilter !== 'all'
+
+  // Reset all search/filter/sort controls to defaults
+  function clearFilters() {
+    setSearchQuery('')
+    setTypeFilter('all')
+    setSortOrder('newest')
+  }
 
 
   //   Form change handler   
@@ -236,6 +286,73 @@ export default function Transactions1() {
         </button>
       </div>
 
+      {/* ── Search, Filter & Sort controls ── */}
+      {/* Only show these controls when there is at least one transaction */}
+      {transactions.length > 0 && (
+        <div className="t1-controls">
+
+          {/* Search bar */}
+          <div className="t1-search-wrap">
+            <label htmlFor="t1-search" className="t1-visually-hidden">Search transactions</label>
+            {/* Search icon (SVG so no extra library needed) */}
+            <svg className="t1-search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fillRule="evenodd" d="M9 3a6 6 0 100 12A6 6 0 009 3zM1 9a8 8 0 1114.32 4.906l3.387 3.387a1 1 0 01-1.414 1.414l-3.387-3.387A8 8 0 011 9z" clipRule="evenodd" />
+            </svg>
+            {/*
+              Controlled input – value comes from state, onChange updates state.
+              Every keystroke triggers a re-render, which recomputes displayedTransactions.
+            */}
+            <input
+              id="t1-search"
+              type="text"
+              className="t1-search-input"
+              placeholder="Search by title…"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            {/* Clear button – only visible when something is typed */}
+            {searchQuery && (
+              <button
+                className="t1-search-clear"
+                onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Type filter pills */}
+          <div className="t1-filter-group" role="group" aria-label="Filter by type">
+            {['all', 'income', 'expense'].map(type => (
+              <button
+                key={type}
+                className={`t1-filter-btn t1-filter-btn--${type} ${typeFilter === type ? 'active' : ''}`}
+                onClick={() => setTypeFilter(type)}
+              >
+                {type === 'all' ? 'All' : type === 'income' ? '↑ Income' : '↓ Expense'}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort dropdown */}
+          <div className="t1-sort-wrap">
+            <label htmlFor="t1-sort" className="t1-visually-hidden">Sort transactions</label>
+            <select
+              id="t1-sort"
+              className="t1-sort-select"
+              value={sortOrder}
+              onChange={e => setSortOrder(e.target.value)}
+            >
+              {SORT_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+
+        </div>
+      )}
+
       {/*Summary cards */}
       <div className="t1-summary">
 
@@ -269,18 +386,39 @@ export default function Transactions1() {
       {/*  Transaction list (or empty state)  */}
       {transactions.length === 0 ? (
 
-        /* Show this when there are no transactions */
+        /* ── Case 1: user has no transactions at all ── */
         <div className="t1-empty">
           <div className="t1-empty__icon">📭</div>
           <p className="t1-empty__title">No transactions yet</p>
           <p className="t1-empty__sub">Add your first transaction to start tracking your finances.</p>
         </div>
 
+      ) : displayedTransactions.length === 0 ? (
+
+        /* ── Case 2: transactions exist but none match the current search/filter ── */
+        <div className="t1-empty t1-empty--filtered">
+          <div className="t1-empty__icon">🔍</div>
+          <p className="t1-empty__title">No transactions found</p>
+          {searchQuery.trim() ? (
+            <p className="t1-empty__sub">
+              No transactions match &ldquo;<strong>{searchQuery.trim()}</strong>&rdquo;
+              {typeFilter !== 'all' && <> in <strong>{typeFilter}</strong> transactions</>}.
+            </p>
+          ) : (
+            <p className="t1-empty__sub">
+              No <strong>{typeFilter}</strong> transactions to show.
+            </p>
+          )}
+          <button className="t1-btn-clear-filters" onClick={clearFilters}>
+            Clear search &amp; filters
+          </button>
+        </div>
+
       ) : (
 
-        /* Use map() to render one row for each transaction */
+        /* ── Case 3: render the filtered + sorted list with map() ── */
         <div className="t1-list">
-          {transactions.map((txn, index) => (
+          {displayedTransactions.map((txn, index) => (
             <div key={txn.id} className={`t1-item t1-item--${txn.type}`} style={{ animationDelay: `${0.1 + index * 0.06}s` }}>
 
               {/* Left side: category icon bubble + title + meta */}
