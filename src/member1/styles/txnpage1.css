@@ -739,3 +739,201 @@
     width: 100%;
   }
 }
+
+/* ================================================================
+   Transaction Detail Drawer
+   Slides in from the right edge of the viewport.
+   Uses the existing CSS variable tokens from theme1.css.
+   ================================================================ */
+
+/* ── Backdrop (full-screen dim layer behind the panel) ────────── */
+.t1-drawer-overlay {
+  position: fixed;
+  inset: 0;                          /* top:0 right:0 bottom:0 left:0 */
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 900;                      /* below the Add/Edit modal (z:1000) */
+  display: flex;
+  align-items: center;               /* vertically centred */
+  justify-content: center;           /* horizontally centred */
+  padding: 20px;                     /* safe gap on small screens */
+}
+
+/* ── Panel (centred modal card) ───────────────────────────────── */
+.t1-drawer {
+  width: 100%;
+  max-width: 460px;                  /* square-ish: content determines height */
+  max-height: 88vh;                  /* never taller than the viewport */
+  background: var(--m1-bg-surface);
+  border: 1px solid var(--m1-border-strong);
+  border-radius: 20px;               /* rounded on all four sides */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: var(--m1-shadow-modal);
+  animation: t1DrawerIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Scale + fade pop-in — matches the Add/Edit modal feel */
+@keyframes t1DrawerIn {
+  from { opacity: 0; transform: scale(0.94) translateY(-10px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* Thin scrollbar inside the drawer */
+.t1-drawer::-webkit-scrollbar { width: 4px; }
+.t1-drawer::-webkit-scrollbar-track { background: transparent; }
+.t1-drawer::-webkit-scrollbar-thumb { background: var(--m1-border-strong); border-radius: 4px; }
+
+/* ── Header ───────────────────────────────────────────────────── */
+.t1-drawer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--m1-border);
+  flex-shrink: 0;                   /* never squish even if content is tall */
+}
+
+.t1-drawer__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Reuse the same close-button style as the modal */
+.t1-drawer__close {
+  background: var(--m1-input-bg);
+  border: 1px solid var(--m1-border);
+  font-size: 15px;
+  color: var(--m1-text-secondary);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.t1-drawer__close:hover { background: var(--m1-expense-bg); color: var(--m1-expense); }
+
+/* ── Body ─────────────────────────────────────────────────────── */
+.t1-drawer__body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  flex: 1;
+}
+
+/* ── Icon + title row ─────────────────────────────────────────── */
+.t1-drawer__icon-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.t1-drawer__big-icon {
+  font-size: 32px;
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: var(--m1-bg-card);
+  border: 1px solid var(--m1-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.t1-drawer__name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* ── Large amount ─────────────────────────────────────────────── */
+.t1-drawer__amount {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  display: block;
+}
+
+.t1-drawer__amount--income  { color: var(--m1-income); }
+.t1-drawer__amount--expense { color: var(--m1-expense); }
+
+/* ── Key-value detail list ────────────────────────────────────── */
+.t1-drawer__details {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--m1-bg-card);
+  border: 1px solid var(--m1-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.t1-drawer__detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--m1-border);
+  gap: 12px;
+}
+
+.t1-drawer__detail-row:last-child { border-bottom: none; }
+
+.t1-drawer__detail-row dt {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--m1-text-muted);
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.t1-drawer__detail-row dd {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--m1-text-primary);
+  margin: 0;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* ── Action buttons at the bottom of the drawer ──────────────── */
+.t1-drawer__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;              /* push buttons to the bottom of the body */
+  padding-top: 4px;
+}
+
+.t1-drawer__actions .t1-btn-edit,
+.t1-drawer__actions .t1-btn-delete {
+  flex: 1;
+  padding: 11px 8px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ── Mobile: stretch to full width with smaller radius ─────────── */
+@media (max-width: 480px) {
+  .t1-drawer {
+    max-width: 100%;
+    border-radius: 14px;
+  }
+}

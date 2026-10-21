@@ -72,6 +72,10 @@ export default function Transactions1() {
   // sortOrder: how to order the visible rows
   const [sortOrder, setSortOrder] = useState('newest')
 
+  // selectedTxn: the transaction object shown in the detail drawer.
+  // null = drawer is closed. Set to a transaction object to open it.
+  const [selectedTxn, setSelectedTxn] = useState(null)
+
 
   //   Load from localStorage on first render   
   // useEffect with [] runs only ONCE when the component first appears on screen.
@@ -90,6 +94,20 @@ export default function Transactions1() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
   }, [transactions]) // runs whenever transactions changes
+
+
+  //   Close the detail drawer when Escape is pressed  
+  // The dependency array [selectedTxn] means this effect re-runs every time
+  // selectedTxn changes.  When the drawer opens we attach the listener; the
+  // cleanup return removes it when the drawer closes or the component unmounts
+  // – this prevents a memory leak from stale event listeners.
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') setSelectedTxn(null)
+    }
+    if (selectedTxn) document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedTxn])
 
 
   //   Summary calculations   
@@ -417,7 +435,12 @@ export default function Transactions1() {
         /* ── Case 3: render the filtered + sorted list with map() ── */
         <div className="t1-list">
           {displayedTransactions.map((txn, index) => (
-            <div key={txn.id} className={`t1-item t1-item--${txn.type}`} style={{ animationDelay: `${0.1 + index * 0.06}s` }}>
+            <div
+              key={txn.id}
+              className={`t1-item t1-item--${txn.type}`}
+              style={{ animationDelay: `${0.1 + index * 0.06}s`, cursor: 'pointer' }}
+              onClick={() => setSelectedTxn(txn)}
+            >
 
               {/* Left side: category icon bubble + title + meta */}
               <div className="t1-item__left">
@@ -447,12 +470,14 @@ export default function Transactions1() {
                 <div className="t1-item__actions">
                   <button
                     className="t1-btn-edit"
-                    onClick={() => openEditForm(txn)}
+                    onClick={e => { e.stopPropagation(); openEditForm(txn) }}
                   >
                     Edit
                   </button>
                   {itemToDelete === txn.id ? (
-                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    // stopPropagation on the confirm div so "Sure? Yes/No"
+                    // clicks don't bubble up to the row and open the drawer
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
                       <span style={{ fontSize: '12px', color: 'var(--m1-expense)', fontWeight: 'bold', marginRight: '4px' }}>Sure?</span>
                       <button
                         className="t1-btn-delete"
@@ -470,7 +495,7 @@ export default function Transactions1() {
                   ) : (
                     <button
                       className="t1-btn-delete"
-                      onClick={() => setItemToDelete(txn.id)}
+                      onClick={e => { e.stopPropagation(); setItemToDelete(txn.id) }}
                     >
                       Delete
                     </button>
@@ -601,6 +626,105 @@ export default function Transactions1() {
 
             </form>
           </div>
+        </div>
+      )}
+
+
+      {/* ── Transaction Detail Drawer ────────────────────────────────────────────
+          Conditional rendering: this entire block only exists in the DOM when
+          selectedTxn is truthy.  Clicking a row sets selectedTxn to that
+          transaction object, which triggers a re-render and shows the drawer.
+      ───────────────────────────────────────────────────────────────────────── */}
+      {selectedTxn && (
+        /* Semi-transparent backdrop – clicking anywhere outside the panel closes it */
+        <div className="t1-drawer-overlay" onClick={() => setSelectedTxn(null)}>
+
+          {/* The side panel. stopPropagation stops clicks inside from reaching
+              the overlay and accidentally closing the drawer. */}
+          <aside
+            className="t1-drawer"
+            onClick={e => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Transaction details"
+          >
+
+            {/* ── Drawer header ── */}
+            <div className="t1-drawer__header">
+              <h2 className="t1-drawer__title">Transaction Details</h2>
+              <button
+                className="t1-drawer__close"
+                onClick={() => setSelectedTxn(null)}
+                aria-label="Close details"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* ── Drawer body ── */}
+            <div className="t1-drawer__body">
+
+              {/* Icon bubble + title + income/expense badge */}
+              <div className="t1-drawer__icon-row">
+                <span className="t1-drawer__big-icon">
+                  {CATEGORY_ICONS[selectedTxn.category] || (selectedTxn.type === 'income' ? '💰' : '💸')}
+                </span>
+                <div>
+                  <p className="t1-drawer__name">{selectedTxn.title}</p>
+                  <span className={`t1-item__badge t1-item__badge--${selectedTxn.type}`}>
+                    {selectedTxn.type}
+                  </span>
+                </div>
+              </div>
+
+              {/* Large amount display */}
+              <span className={`t1-drawer__amount t1-drawer__amount--${selectedTxn.type}`}>
+                {selectedTxn.type === 'income' ? '+' : '−'}{formatCurrency(selectedTxn.amount)}
+              </span>
+
+              {/* Key-value detail list */}
+              <dl className="t1-drawer__details">
+                <div className="t1-drawer__detail-row">
+                  <dt>Category</dt>
+                  <dd>{selectedTxn.category}</dd>
+                </div>
+                <div className="t1-drawer__detail-row">
+                  <dt>Date</dt>
+                  <dd>{formatDate(selectedTxn.date)}</dd>
+                </div>
+                <div className="t1-drawer__detail-row">
+                  <dt>Type</dt>
+                  <dd style={{ textTransform: 'capitalize' }}>{selectedTxn.type}</dd>
+                </div>
+                {/* Description row only renders when a note was saved */}
+                {selectedTxn.description && (
+                  <div className="t1-drawer__detail-row">
+                    <dt>Note</dt>
+                    <dd>{selectedTxn.description}</dd>
+                  </div>
+                )}
+              </dl>
+
+              {/* Quick-action buttons inside the drawer.
+                  Edit: opens the modal and closes the drawer.
+                  Delete: sets itemToDelete (shows inline confirm in the list) and closes drawer. */}
+              <div className="t1-drawer__actions">
+                <button
+                  className="t1-btn-edit"
+                  onClick={() => { openEditForm(selectedTxn); setSelectedTxn(null) }}
+                >
+                  ✏ Edit
+                </button>
+                <button
+                  className="t1-btn-delete"
+                  onClick={() => { setItemToDelete(selectedTxn.id); setSelectedTxn(null) }}
+                >
+                  🗑 Delete
+                </button>
+              </div>
+
+            </div>
+          </aside>
         </div>
       )}
 
