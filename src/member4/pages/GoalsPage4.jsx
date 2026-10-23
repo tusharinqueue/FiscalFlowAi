@@ -1,18 +1,26 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLocalStorage4 } from '../hooks/useLocalStorage4'
+import { useAlerts4 } from '../hooks/useAlerts4'
 import '../styles/goals4.css'
+
+const getFutureDate = (days) => {
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  return d.toISOString().split('T')[0]
+}
 
 export default function GoalsPage4() {
   const [goals, setGoals] = useLocalStorage4('m4-goals', [
-    { id: 1, title: 'Emergency Fund', icon: '🏦', current: 1500, target: 5000, timeframeValue: '2', timeframeUnit: 'years', history: [] },
-    { id: 2, title: 'Summer Vacation', icon: '✈️', current: 800, target: 2000, timeframeValue: '6', timeframeUnit: 'months', history: [] },
-    { id: 3, title: 'New Car Downpayment', icon: '🚗', current: 5000, target: 15000, timeframeValue: '3', timeframeUnit: 'years', history: [] }
+    { id: 1, title: 'Emergency Fund', icon: '🏦', current: 5000, target: 5000, timeframeValue: '2', timeframeUnit: 'years', deadline: getFutureDate(365), history: [] },
+    { id: 2, title: 'Summer Vacation', icon: '✈️', current: 800, target: 2000, timeframeValue: '6', timeframeUnit: 'months', deadline: getFutureDate(5), history: [] },
+    { id: 3, title: 'New Car Downpayment', icon: '🚗', current: 5000, target: 15000, timeframeValue: '3', timeframeUnit: 'years', deadline: getFutureDate(700), history: [] }
   ])
 
-  const initialGoalForm = { title: '', icon: '🎯', target: '', timeframeValue: '', timeframeUnit: 'years' }
+  const initialGoalForm = { title: '', icon: '🎯', target: '', timeframeValue: '', timeframeUnit: 'years', deadline: '' }
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newGoal, setNewGoal] = useState(initialGoalForm)
+  const { alerts, dismissAlert } = useAlerts4(goals)
 
   const formatMoney = (amt) => '$' + Number(amt).toLocaleString()
   
@@ -31,6 +39,7 @@ export default function GoalsPage4() {
       target: Number(newGoal.target),
       timeframeValue: newGoal.timeframeValue,
       timeframeUnit: newGoal.timeframeUnit,
+      deadline: newGoal.deadline || '',
       history: []
     }
     setGoals([...goals, goal])
@@ -82,6 +91,26 @@ export default function GoalsPage4() {
           + Create Goal
         </button>
       </div>
+
+      {alerts.length > 0 && (
+        <div className="alerts-container">
+          {alerts.map(a => (
+            <div key={a.id} className={`goal-alert ${a.type}`}>
+              <div className="alert-body">
+                <span className="alert-icon">{a.icon}</span>
+                <div>
+                  <strong>{a.title}: </strong>
+                  <span>{a.message}</span>
+                </div>
+              </div>
+              <div className="alert-actions">
+                <Link to={`/goals/${a.goalId}`} className="alert-link">View Goal →</Link>
+                <button type="button" className="alert-dismiss" onClick={() => dismissAlert(a.id)} title="Dismiss">✕</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="goals-summary">
         <div className="summary-card">
@@ -193,6 +222,14 @@ export default function GoalsPage4() {
                     <option value="months">Months</option>
                   </select>
                 </div>
+              </div>
+              <div className="form-group">
+                <label>Target Deadline (Optional)</label>
+                <input 
+                  type="date" 
+                  value={newGoal.deadline} 
+                  onChange={e => setNewGoal({...newGoal, deadline: e.target.value})} 
+                />
               </div>
 
               {renderInvestmentPreview()}

@@ -428,3 +428,74 @@
 .timeframe-group select {
   flex: 1;
 }
+
+/* Smart Deadline & Risk Alerts Engine */
+.alerts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.goal-alert {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: 1px solid transparent;
+  animation: alertFadeIn 0.3s ease;
+}
+@keyframes alertFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.goal-alert.celebration {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+.goal-alert.urgent {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+}
+.goal-alert.overdue {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+.alert-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.alert-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.alert-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.alert-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  font-size: 13px;
+}
+.alert-dismiss {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+.alert-dismiss:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}

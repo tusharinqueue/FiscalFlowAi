@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useLocalStorage4 } from '../hooks/useLocalStorage4'
 import { useInvestment4 } from '../hooks/useInvestment4'
+import { useAlerts4 } from '../hooks/useAlerts4'
 import '../styles/goals4.css'
 
 export default function GoalDetailsPage4() {
@@ -37,6 +38,8 @@ export default function GoalDetailsPage4() {
 
   const monthsRemaining = getMonthsRemaining(goal)
   const { invData, loadingApi, calculateRequiredMonthly, calculateTotalReturn } = useInvestment4(goal, monthsRemaining, isCompleted)
+  const { alerts } = useAlerts4(goal ? [goal] : [])
+  const goalAlert = alerts[0]
 
   if (!goal) return <div className="goals-container" style={{paddingTop: '50px', textAlign: 'center'}}>Goal not found.</div>
 
@@ -83,6 +86,18 @@ export default function GoalDetailsPage4() {
       
       <div className="goal-details-layout">
         <div className="goal-details-main">
+          {goalAlert && (
+            <div className={`goal-alert ${goalAlert.type}`} style={{ marginBottom: '20px' }}>
+              <div className="alert-body">
+                <span className="alert-icon">{goalAlert.icon}</span>
+                <div>
+                  <strong>{goalAlert.title}: </strong>
+                  <span>{goalAlert.message}</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="goal-detail-header">
             <div className="goal-icon" style={{fontSize: '36px'}}>{goal.icon}</div>
             <div className="goal-detail-title">{goal.title}</div>
@@ -117,12 +132,6 @@ export default function GoalDetailsPage4() {
               style={{ width: `${percent}%`, background: isCompleted ? '#3b82f6' : '#34d399' }}
             ></div>
           </div>
-          
-          {isCompleted && (
-            <div style={{ marginTop: '20px', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', borderRadius: '8px', textAlign: 'center', fontWeight: '600' }}>
-              🎉 Congratulations! You have reached this goal!
-            </div>
-          )}
 
           {!isCompleted && monthsRemaining > 0 && (
             <div className="investment-section">
