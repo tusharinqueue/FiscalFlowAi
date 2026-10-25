@@ -937,3 +937,219 @@
     border-radius: 14px;
   }
 }
+
+/* ================================================================
+   Export Transaction History – button, modal & form styles
+   ================================================================ */
+
+/* ── Header action group (Export + Add buttons side by side) ───── */
+.t1-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Export button ─────────────────────────────────────────────── */
+.t1-btn-export {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: transparent;
+  color: var(--m1-accent-light);
+  border: 1.5px solid var(--m1-accent);
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.t1-btn-export:hover {
+  background: var(--m1-accent);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--m1-accent-glow);
+  transform: translateY(-1px);
+}
+
+.t1-btn-export:active {
+  transform: translateY(0);
+}
+
+/* ── Export modal (wider than Add modal for the fieldsets) ──────── */
+.t1-export-modal {
+  max-width: 540px;
+}
+
+/* ── Success message ───────────────────────────────────────────── */
+.t1-export-success {
+  font-size: 13px;
+  color: var(--m1-income);
+  background: var(--m1-income-bg);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-weight: 600;
+}
+
+/* ── Fieldset / legend ─────────────────────────────────────────── */
+.t1-export-fieldset {
+  border: 1px solid var(--m1-border);
+  border-radius: 12px;
+  padding: 16px 16px 14px;
+  margin: 0 0 16px 0;
+}
+
+.t1-export-legend {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--m1-text-muted);
+  padding: 0 6px;
+}
+
+/* ── Radio card group ──────────────────────────────────────────── */
+.t1-export-radio-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* ── Individual radio card (file format: icon + text) ───────────── */
+.t1-export-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--m1-border);
+  border-radius: 10px;
+  background: var(--m1-input-bg);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  flex: 1 1 140px;
+  min-width: 130px;
+}
+
+/* Hide the native radio button visually */
+.t1-export-radio-label input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.t1-export-radio-label:hover {
+  border-color: var(--m1-accent);
+  background: var(--m1-bg-card-hover);
+}
+
+.t1-export-radio-label.selected {
+  border-color: var(--m1-accent);
+  background: rgba(124, 58, 237, 0.1);
+  box-shadow: 0 0 0 3px var(--m1-accent-glow);
+}
+
+.t1-export-radio-label strong {
+  display: block;
+  font-size: 13px;
+  color: var(--m1-text-primary);
+  line-height: 1.2;
+}
+
+.t1-export-radio-label small {
+  display: block;
+  font-size: 11px;
+  color: var(--m1-text-muted);
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+.t1-export-radio-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* ── Compact type / date-range radio cards ─────────────────────── */
+.t1-export-radio-label--type {
+  flex: 1 1 auto;
+  min-width: 100px;
+  padding: 10px 14px;
+  justify-content: center;
+}
+
+.t1-export-radio-label--type strong {
+  font-size: 12px;
+  text-align: center;
+  color: var(--m1-text-secondary);
+}
+
+.t1-export-radio-label--type.selected strong {
+  color: var(--m1-accent-light);
+}
+
+/* ── Custom date row inside the fieldset ───────────────────────── */
+.t1-export-date-row {
+  margin-top: 14px;
+}
+
+/* ── Download button (reuses t1-btn-submit, override flex gap) ─── */
+.t1-btn-download {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.t1-btn-download:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Spinner inside the download button ──────────────────────── */
+@keyframes t1Spin {
+  to { transform: rotate(360deg); }
+}
+
+.t1-export-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: t1Spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Responsive: stack header actions on very small screens ─────── */
+@media (max-width: 400px) {
+  .t1-header-actions {
+    width: 100%;
+  }
+  .t1-btn-export,
+  .t1-btn-add {
+    flex: 1;
+    justify-content: center;
+  }
+  .t1-export-radio-group {
+    flex-direction: column;
+  }
+  .t1-export-radio-label,
+  .t1-export-radio-label--type {
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .t1-export-modal {
+    padding: 20px 16px;
+  }
+}
+
