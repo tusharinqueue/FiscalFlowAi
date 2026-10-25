@@ -5,6 +5,7 @@ import SubscriptionCard2 from '../components/SubscriptionCard2'
 import SubscriptionFilters2 from '../components/SubscriptionFilters2'
 import SubscriptionModal2 from '../components/SubscriptionModal2'
 import SubscriptionStats2 from '../components/SubscriptionStats2'
+import SmartSubscriptionInsights2 from '../components/SmartSubscriptionInsights2'
 import UpcomingRenewals2 from '../components/UpcomingRenewals2'
 import {
   calculateNextRenewalDate,
@@ -214,6 +215,10 @@ export default function Subscriptions2() {
           totalCount={subscriptions.length}
           monthlyEstimatedCost={stats.monthlyCost}
         />
+      )}
+
+      {subscriptions.length > 0 && (
+        <SmartSubscriptionInsights2 subscriptions={subscriptions} />
       )}
 
       <UpcomingRenewals2
