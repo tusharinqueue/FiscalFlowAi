@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useLocalStorage2 } from '../hooks/useLocalStorage2'
 import ProfileDetailsCard2 from '../components/ProfileDetailsCard2'
 import ProfileSubscriptionSummary2 from '../components/ProfileSubscriptionSummary2'
+import { calculateMonthlySpend } from '../utils/subscriptionUtils2'
 import '../../member1/styles/theme1.css'
 import '../styles/profile2.css'
 
@@ -15,26 +16,25 @@ const DEFAULT_PROFILE = {
   occupation: ''
 }
 
-function getMonthlySpend(subscriptions) {
-  return subscriptions
-    .filter(subscription => subscription.status === 'Active')
-    .reduce((total, subscription) => {
-      const divisor = { Yearly: 12, Quarterly: 3 }[subscription.billingCycle] || 1
-      return total + (Number(subscription.amount) || 0) / divisor
-    }, 0)
-}
-
 export default function Profile2() {
   const [storedUser, setStoredUser] = useLocalStorage2('m1-user', DEFAULT_PROFILE)
   const [subscriptions] = useLocalStorage2('subscriptions', [])
   const [groups, setGroups] = useState([])
   const [myName, setMyName] = useState('')
 
+  // Load member 3 group expense data from localStorage if available
   useEffect(() => {
-    const g = localStorage.getItem('m3-groups')
-    if (g) setGroups(JSON.parse(g))
-    const name = localStorage.getItem('m3-myname')
-    if (name) setMyName(name)
+    const savedGroups = localStorage.getItem('m3-groups')
+    if (savedGroups) {
+      try {
+        setGroups(JSON.parse(savedGroups))
+      } catch {
+        setGroups([])
+      }
+    }
+
+    const savedName = localStorage.getItem('m3-myname')
+    if (savedName) setMyName(savedName)
   }, [])
 
   const [isEditing, setIsEditing] = useState(false)
@@ -45,9 +45,11 @@ export default function Profile2() {
   const [message, setMessage] = useState({ error: '', success: '' })
 
   const userProfile = { ...DEFAULT_PROFILE, ...storedUser }
+
+  // Compute active subscription metrics using shared util
   const summary = useMemo(() => {
     const activeCount = subscriptions.filter(sub => sub.status === 'Active').length
-    const monthlySpend = getMonthlySpend(subscriptions)
+    const monthlySpend = calculateMonthlySpend(subscriptions)
 
     return {
       totalCount: subscriptions.length,
@@ -57,6 +59,7 @@ export default function Profile2() {
     }
   }, [subscriptions])
 
+  // Get user avatar initials (e.g. "Chatnay Garg" -> "CG")
   const initials = (userProfile.name.match(/\b\w/g) || ['U'])
     .join('')
     .slice(0, 2)
@@ -181,7 +184,7 @@ export default function Profile2() {
             groups.forEach(g => {
               if (!g.members.includes(myName)) return
               const bal = {}
-              g.members.forEach(m => bal[m] = 0)
+              g.members.forEach(m => { bal[m] = 0 })
               g.expenses.forEach(exp => {
                 const share = exp.amount / exp.splitAmong.length
                 exp.splitAmong.forEach(m => {

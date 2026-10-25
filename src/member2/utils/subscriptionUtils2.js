@@ -36,7 +36,9 @@ export const INITIAL_FORM_STATE = {
   status: 'Active'
 }
 
-// Helper: Calculate next renewal date based on start date and billing cycle
+/**
+ * Calculate next renewal date based on start date and billing cycle
+ */
 export function calculateNextRenewalDate(startDateString, billingCycle) {
   if (!startDateString) return ''
 
@@ -67,7 +69,9 @@ export function calculateNextRenewalDate(startDateString, billingCycle) {
   return `${year}-${formattedMonth}-${formattedDay}`
 }
 
-// Helper: Calculate remaining days until renewal
+/**
+ * Calculate remaining days until renewal
+ */
 export function getDaysUntilRenewal(nextRenewalDate) {
   if (!nextRenewalDate) return null
 
@@ -82,7 +86,9 @@ export function getDaysUntilRenewal(nextRenewalDate) {
   return Math.round(diffInMs / (1000 * 60 * 60 * 24))
 }
 
-// Helper: Get readable label and CSS badge class based on remaining days
+/**
+ * Get readable label and CSS badge class based on remaining days
+ */
 export function getRenewalStatus(daysUntil) {
   if (daysUntil === null) {
     return { text: 'Unknown', cls: 'unknown' }
@@ -101,4 +107,73 @@ export function getRenewalStatus(daysUntil) {
     return { text: `Renews in ${daysUntil} days`, cls: 'upcoming' }
   }
   return { text: 'Upcoming', cls: 'scheduled' }
+}
+
+/**
+ * Calculate total monthly spend across all active subscriptions
+ */
+export function calculateMonthlySpend(subscriptions) {
+  if (!Array.isArray(subscriptions)) return 0
+
+  return subscriptions
+    .filter(sub => sub.status === 'Active')
+    .reduce((total, sub) => {
+      const divisor = { Yearly: 12, Quarterly: 3 }[sub.billingCycle] || 1
+      return total + (Number(sub.amount) || 0) / divisor
+    }, 0)
+}
+
+/**
+ * Sync a created or edited subscription with member 1 transactions in localStorage
+ */
+export function syncSubscriptionTransaction(subscription, isUpdate = false) {
+  try {
+    const savedTxnsStr = localStorage.getItem('m1-transactions') || '[]'
+    const savedTxns = JSON.parse(savedTxnsStr)
+    const subTxnId = `sub-${subscription.id}`
+
+    if (isUpdate) {
+      const updatedTxns = savedTxns.map(txn => {
+        if (txn.id === subTxnId) {
+          return {
+            ...txn,
+            title: `Subscription: ${subscription.name}`,
+            amount: subscription.amount,
+            category: subscription.category,
+            date: subscription.startDate
+          }
+        }
+        return txn
+      })
+      localStorage.setItem('m1-transactions', JSON.stringify(updatedTxns))
+    } else {
+      const newTxn = {
+        id: subTxnId,
+        title: `Subscription: ${subscription.name}`,
+        amount: subscription.amount,
+        type: 'expense',
+        category: subscription.category,
+        date: subscription.startDate,
+        description: 'Auto-generated from subscriptions'
+      }
+      localStorage.setItem('m1-transactions', JSON.stringify([newTxn, ...savedTxns]))
+    }
+  } catch {
+    // Gracefully handle storage errors
+  }
+}
+
+/**
+ * Remove linked transaction when a subscription is deleted
+ */
+export function removeSubscriptionTransaction(subscriptionId) {
+  try {
+    const savedTxnsStr = localStorage.getItem('m1-transactions') || '[]'
+    const savedTxns = JSON.parse(savedTxnsStr)
+    const targetId = `sub-${subscriptionId}`
+    const updatedTxns = savedTxns.filter(txn => String(txn.id) !== targetId)
+    localStorage.setItem('m1-transactions', JSON.stringify(updatedTxns))
+  } catch {
+    // Gracefully handle storage errors
+  }
 }
