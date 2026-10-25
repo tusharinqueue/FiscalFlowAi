@@ -1,4 +1,3 @@
-import React from 'react'
 
 export default function SubscriptionStats2({ activeCount, totalCount, monthlyEstimatedCost }) {
   return (

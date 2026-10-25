@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   CATEGORY_OPTIONS,
   BILLING_CYCLE_OPTIONS,

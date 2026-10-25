@@ -1,4 +1,3 @@
-import React from 'react'
 import { CATEGORY_ICONS, getRenewalStatus } from '../utils/subscriptionUtils2'
 
 export default function UpcomingRenewals2({ activeRenewals, totalSubscriptionsCount }) {

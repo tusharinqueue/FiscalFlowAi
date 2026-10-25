@@ -172,7 +172,7 @@ export default function Subscriptions2() {
     let savedTxns = []
     try {
       savedTxns = JSON.parse(savedTxnsStr)
-    } catch (e) {
+    } catch {
       savedTxns = []
     }
 
@@ -216,7 +216,7 @@ export default function Subscriptions2() {
       const savedTxns = JSON.parse(savedTxnsStr)
       const updatedTxns = savedTxns.filter(txn => String(txn.id) !== `sub-${id}`)
       localStorage.setItem('m1-transactions', JSON.stringify(updatedTxns))
-    } catch (e) {
+    } catch {
       // ignore
     }
 

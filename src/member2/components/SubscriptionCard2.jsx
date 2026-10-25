@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   CATEGORY_ICONS,
   getDaysUntilRenewal,

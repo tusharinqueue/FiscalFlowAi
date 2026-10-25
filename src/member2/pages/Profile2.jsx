@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useLocalStorage2 } from '../hooks/useLocalStorage2'
 import ProfileDetailsCard2 from '../components/ProfileDetailsCard2'
