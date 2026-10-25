@@ -1,7 +1,9 @@
 // Transactions1.jsx – Full Transactions page for FiscalFlow AI (Member 1)
-// All logic is in this one file: Add, Edit, Delete, localStorage, validation
+// All logic is in this one file: Add, Edit, Delete, localStorage, validation, Export
 
 import { useState, useEffect } from 'react'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 import '../styles/theme1.css'
 import '../styles/txnpage1.css'
 
@@ -42,6 +44,15 @@ const CATEGORY_ICONS = {
 }
 
 
+// ── Export modal defaults ──────────────────────────────────────────
+const EXPORT_FORM_DEFAULT = {
+  format: 'csv',        // 'csv' | 'pdf'
+  typeFilter: 'all',    // 'all' | 'income' | 'expense'
+  dateRange: 'all',     // 'all' | 'custom'
+  startDate: '',
+  endDate: '',
+}
+
 export default function Transactions1() {
 
   //  State   
@@ -75,6 +86,13 @@ export default function Transactions1() {
   // selectedTxn: the transaction object shown in the detail drawer.
   // null = drawer is closed. Set to a transaction object to open it.
   const [selectedTxn, setSelectedTxn] = useState(null)
+
+  // ── Export modal state ────────────────────────────────────────────
+  const [showExportModal, setShowExportModal] = useState(false)
+  const [exportForm, setExportForm] = useState(EXPORT_FORM_DEFAULT)
+  const [exportError, setExportError] = useState('')
+  const [exportLoading, setExportLoading] = useState(false)
+  const [exportSuccess, setExportSuccess] = useState('')
 
 
   //   Load from localStorage on first render   
@@ -287,6 +305,316 @@ export default function Transactions1() {
   }
 
 
+  // ── Export helpers ─────────────────────────────────────────────────
+
+  /** Sanitise a cell value to prevent formula injection in CSV */
+  function sanitiseCsvCell(value) {
+    const str = String(value ?? '')
+    // Escape internal double-quotes by doubling them, then wrap in quotes
+    const escaped = str.replace(/"/g, '""')
+    // Prefix potential injection starters
+    const safe = /^[=+\-@\t\r]/.test(escaped) ? `'${escaped}` : escaped
+    return `"${safe}"`
+  }
+
+  /** Format a plain numeric amount for CSV (no ₹ symbol, just number) */
+  function formatAmountCsv(amount) {
+    return Number(amount).toFixed(2)
+  }
+
+  /** Format a date string as DD/MM/YYYY for the report */
+  function formatDateReport(dateStr) {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    const dd = String(d.getDate()).padStart(2, '0')
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const yyyy = d.getFullYear()
+    return `${dd}/${mm}/${yyyy}`
+  }
+
+  /**
+   * Returns the subset of transactions that match the export form selections.
+   * All filtering is done against the real `transactions` state (not displayedTransactions),
+   * so pagination / current UI filters do not limit what gets exported.
+   */
+  function getExportTransactions() {
+    return transactions
+      .filter(t => {
+        // Type filter
+        if (exportForm.typeFilter !== 'all' && t.type !== exportForm.typeFilter) return false
+        // Date range filter
+        if (exportForm.dateRange === 'custom') {
+          const txDate = new Date(t.date)
+          if (exportForm.startDate) {
+            const start = new Date(exportForm.startDate)
+            if (txDate < start) return false
+          }
+          if (exportForm.endDate) {
+            const end = new Date(exportForm.endDate)
+            // Include the full end day
+            end.setHours(23, 59, 59, 999)
+            if (txDate > end) return false
+          }
+        }
+        return true
+      })
+      // Sort newest first in the export
+      .slice()
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+  }
+
+  /** Build and trigger download of a CSV file */
+  function generateCSV(rows) {
+    const header = ['Date', 'Transaction Title', 'Category', 'Transaction Type', 'Amount (INR)']
+    const csvRows = [
+      header.map(sanitiseCsvCell).join(','),
+      ...rows.map(t => [
+        sanitiseCsvCell(formatDateReport(t.date)),
+        sanitiseCsvCell(t.title),
+        sanitiseCsvCell(t.category),
+        sanitiseCsvCell(t.type === 'income' ? 'Income' : 'Expense'),
+        sanitiseCsvCell(formatAmountCsv(t.amount)),
+      ].join(','))
+    ]
+    const csvContent = csvRows.join('\r\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    const today = new Date().toISOString().slice(0, 10)
+    link.href = url
+    link.download = `FiscalFlow_Transactions_${today}.csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  /** Build and trigger download of a PDF report */
+  function generatePDF(rows) {
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+    // ── Colour palette matching the app theme ─────────────────────
+    const PURPLE    = [124, 58, 237]
+    const DARK_BG   = [15, 17, 32]
+    const LIGHT_ROW = [22, 24, 44]
+    const ALT_ROW   = [18, 20, 38]
+    const GREEN     = [16, 185, 129]
+    const RED       = [239, 68, 68]
+    const WHITE     = [232, 234, 246]
+    const MUTED     = [138, 146, 176]
+
+    const PAGE_W = doc.internal.pageSize.getWidth()
+    const PAGE_H = doc.internal.pageSize.getHeight()
+    const MARGIN = 14
+
+    // ── Background fill ───────────────────────────────────────────
+    doc.setFillColor(...DARK_BG)
+    doc.rect(0, 0, PAGE_W, PAGE_H, 'F')
+
+    // ── Header banner ─────────────────────────────────────────────
+    doc.setFillColor(...PURPLE)
+    doc.roundedRect(MARGIN, 12, PAGE_W - MARGIN * 2, 32, 4, 4, 'F')
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.setTextColor(...WHITE)
+    doc.text('FiscalFlow AI', MARGIN + 8, 24)
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(9)
+    doc.setTextColor(200, 190, 255)
+    doc.text('Transaction History Report', MARGIN + 8, 31)
+
+    // Report meta (top-right of banner)
+    const today = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    doc.setFontSize(8)
+    doc.setTextColor(200, 190, 255)
+    doc.text(`Generated: ${today}`, PAGE_W - MARGIN - 2, 24, { align: 'right' })
+
+    // Date range label
+    let rangeLabel = 'All Time'
+    if (exportForm.dateRange === 'custom') {
+      const s = exportForm.startDate ? formatDateReport(exportForm.startDate) : 'Start'
+      const e = exportForm.endDate   ? formatDateReport(exportForm.endDate)   : 'End'
+      rangeLabel = `${s} – ${e}`
+    }
+    doc.text(`Period: ${rangeLabel}`, PAGE_W - MARGIN - 2, 31, { align: 'right' })
+
+    // Type label
+    const typeLabel = exportForm.typeFilter === 'all' ? 'All Transactions'
+      : exportForm.typeFilter === 'income' ? 'Income Only' : 'Expenses Only'
+    doc.text(`Filter: ${typeLabel}`, PAGE_W - MARGIN - 2, 37, { align: 'right' })
+
+    // ── Summary section ───────────────────────────────────────────
+    const exportIncome  = rows.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
+    const exportExpense = rows.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    const exportBalance = exportIncome - exportExpense
+
+    const summaryY = 52
+    const boxW = (PAGE_W - MARGIN * 2 - 9) / 4
+
+    const summaryItems = [
+      { label: 'Transactions', value: String(rows.length), color: WHITE },
+      { label: 'Total Income',  value: formatCurrency(exportIncome),   color: GREEN },
+      { label: 'Total Expenses', value: formatCurrency(exportExpense), color: RED },
+      { label: 'Net Balance',   value: formatCurrency(exportBalance),  color: exportBalance >= 0 ? GREEN : RED },
+    ]
+
+    summaryItems.forEach((item, i) => {
+      const bx = MARGIN + i * (boxW + 3)
+      doc.setFillColor(...LIGHT_ROW)
+      doc.roundedRect(bx, summaryY, boxW, 20, 3, 3, 'F')
+      doc.setFont('helvetica', 'normal')
+      doc.setFontSize(7)
+      doc.setTextColor(...MUTED)
+      doc.text(item.label.toUpperCase(), bx + boxW / 2, summaryY + 6, { align: 'center' })
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(9)
+      doc.setTextColor(...item.color)
+      // Trim long currency strings
+      const valText = doc.splitTextToSize(item.value, boxW - 4)
+      doc.text(valText[0], bx + boxW / 2, summaryY + 14, { align: 'center' })
+    })
+
+    // ── Transaction table ─────────────────────────────────────────
+    const tableBody = rows.map(t => [
+      formatDateReport(t.date),
+      t.title,
+      t.category,
+      t.type === 'income' ? 'Income' : 'Expense',
+      (t.type === 'income' ? '+ ' : '- ') + formatCurrency(t.amount),
+    ])
+
+    autoTable(doc, {
+      startY: summaryY + 26,
+      margin: { left: MARGIN, right: MARGIN },
+      head: [['Date', 'Title', 'Category', 'Type', 'Amount']],
+      body: tableBody,
+      theme: 'plain',
+      styles: {
+        font: 'helvetica',
+        fontSize: 9,
+        textColor: WHITE,
+        cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+        overflow: 'linebreak',
+        lineWidth: 0,
+      },
+      headStyles: {
+        fillColor: PURPLE,
+        textColor: WHITE,
+        fontStyle: 'bold',
+        fontSize: 8,
+        halign: 'left',
+      },
+      columnStyles: {
+        0: { cellWidth: 26, halign: 'left' },
+        1: { cellWidth: 'auto' },
+        2: { cellWidth: 28 },
+        3: { cellWidth: 22 },
+        4: { cellWidth: 36, halign: 'right' },
+      },
+      alternateRowStyles: { fillColor: ALT_ROW },
+      rowPageBreak: 'auto',
+      showHead: 'everyPage',
+      didParseCell(data) {
+        // Colour the Type column
+        if (data.section === 'body' && data.column.index === 3) {
+          data.cell.styles.textColor = data.cell.raw === 'Income' ? GREEN : RED
+        }
+        // Colour the Amount column
+        if (data.section === 'body' && data.column.index === 4) {
+          data.cell.styles.textColor = data.cell.raw.startsWith('+') ? GREEN : RED
+        }
+      },
+      willDrawPage(data) {
+        // Redraw background on new pages
+        doc.setFillColor(...DARK_BG)
+        doc.rect(0, 0, PAGE_W, PAGE_H, 'F')
+      },
+      didDrawPage(data) {
+        // Page number footer
+        const pageCount = doc.internal.getNumberOfPages()
+        doc.setFont('helvetica', 'normal')
+        doc.setFontSize(7)
+        doc.setTextColor(...MUTED)
+        doc.text(
+          `Page ${data.pageNumber} of ${pageCount}`,
+          PAGE_W / 2, PAGE_H - 8, { align: 'center' }
+        )
+        doc.text('FiscalFlow AI – Confidential', MARGIN, PAGE_H - 8)
+      },
+    })
+
+    const todayStr = new Date().toISOString().slice(0, 10)
+    doc.save(`FiscalFlow_Transactions_${todayStr}.pdf`)
+  }
+
+  /** Open the export modal and reset form */
+  function openExportModal() {
+    setExportForm(EXPORT_FORM_DEFAULT)
+    setExportError('')
+    setExportSuccess('')
+    setShowExportModal(true)
+  }
+
+  /** Close the export modal */
+  function closeExportModal() {
+    setShowExportModal(false)
+    setExportError('')
+    setExportSuccess('')
+    setExportLoading(false)
+  }
+
+  /** Handle field changes in the export form */
+  function handleExportFormChange(e) {
+    const { name, value } = e.target
+    setExportForm(prev => ({ ...prev, [name]: value }))
+    setExportError('')
+    setExportSuccess('')
+  }
+
+  /** Validate export form and run the export */
+  async function handleExport() {
+    // Validate custom date range
+    if (exportForm.dateRange === 'custom') {
+      if (!exportForm.startDate && !exportForm.endDate) {
+        setExportError('Please enter at least a start date or end date for the custom range.')
+        return
+      }
+      if (exportForm.startDate && exportForm.endDate) {
+        if (new Date(exportForm.startDate) > new Date(exportForm.endDate)) {
+          setExportError('Start date cannot be later than the end date.')
+          return
+        }
+      }
+    }
+
+    const rows = getExportTransactions()
+    if (rows.length === 0) {
+      setExportError('No transactions match your selected filters. Please adjust the options and try again.')
+      return
+    }
+
+    setExportLoading(true)
+    setExportError('')
+
+    try {
+      if (exportForm.format === 'csv') {
+        generateCSV(rows)
+      } else {
+        generatePDF(rows)
+      }
+      setExportSuccess(`✓ ${rows.length} transaction${rows.length !== 1 ? 's' : ''} exported successfully.`)
+      // Auto-close after 1.6 s so the user sees the success message
+      setTimeout(() => closeExportModal(), 1600)
+    } catch (err) {
+      console.error('Export failed:', err)
+      setExportError('Export failed. Please try again.')
+    } finally {
+      setExportLoading(false)
+    }
+  }
+
   //   Render   
   return (
     <div className="t1-page">
@@ -297,9 +625,23 @@ export default function Transactions1() {
           <h1 className="t1-title">Transactions</h1>
           <p className="t1-subtitle">Track your income and expenses</p>
         </div>
-        <button className="t1-btn-add" onClick={openAddForm}>
-          + Add Transaction
-        </button>
+        <div className="t1-header-actions">
+          <button
+            className="t1-btn-export"
+            onClick={openExportModal}
+            aria-label="Export transactions"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Export
+          </button>
+          <button className="t1-btn-add" onClick={openAddForm}>
+            + Add Transaction
+          </button>
+        </div>
       </div>
 
       {/* ── Search, Filter & Sort controls ── */}
@@ -725,6 +1067,186 @@ export default function Transactions1() {
 
             </div>
           </aside>
+        </div>
+      )}
+
+
+
+      {/* ── Export Transaction History Modal ──────────────────────────────────
+          showExportModal controls whether this block is in the DOM.
+      ─────────────────────────────────────────────────────────────────────── */}
+      {showExportModal && (
+        <div className="t1-overlay" onClick={closeExportModal} role="dialog" aria-modal="true" aria-label="Export Transaction History">
+          <div className="t1-modal t1-export-modal" onClick={e => e.stopPropagation()}>
+
+            {/* Modal header */}
+            <div className="t1-modal__header">
+              <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle', marginRight: 8, color: 'var(--m1-accent-light)' }} aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export Transaction History
+              </h2>
+              <button className="t1-modal__close" onClick={closeExportModal} aria-label="Close export modal">✕</button>
+            </div>
+
+            {/* Error message */}
+            {exportError && (
+              <p className="t1-form-error" role="alert">⚠ {exportError}</p>
+            )}
+
+            {/* Success message */}
+            {exportSuccess && (
+              <p className="t1-export-success" role="status">{exportSuccess}</p>
+            )}
+
+            {/* ── A: File Format ── */}
+            <fieldset className="t1-export-fieldset">
+              <legend className="t1-export-legend">File Format</legend>
+              <div className="t1-export-radio-group">
+                <label className={`t1-export-radio-label ${exportForm.format === 'csv' ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="format"
+                    value="csv"
+                    checked={exportForm.format === 'csv'}
+                    onChange={handleExportFormChange}
+                    aria-label="CSV format"
+                  />
+                  <span className="t1-export-radio-icon">📊</span>
+                  <span>
+                    <strong>CSV</strong>
+                    <small>.csv – Spreadsheet</small>
+                  </span>
+                </label>
+                <label className={`t1-export-radio-label ${exportForm.format === 'pdf' ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="format"
+                    value="pdf"
+                    checked={exportForm.format === 'pdf'}
+                    onChange={handleExportFormChange}
+                    aria-label="PDF format"
+                  />
+                  <span className="t1-export-radio-icon">📄</span>
+                  <span>
+                    <strong>PDF</strong>
+                    <small>.pdf – Print & Share</small>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+
+            {/* ── B: Transactions to Export ── */}
+            <fieldset className="t1-export-fieldset">
+              <legend className="t1-export-legend">Transactions to Export</legend>
+              <div className="t1-export-radio-group">
+                {[['all', '↕ All Transactions'], ['income', '↑ Income Only'], ['expense', '↓ Expenses Only']].map(([val, lbl]) => (
+                  <label key={val} className={`t1-export-radio-label t1-export-radio-label--type ${exportForm.typeFilter === val ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name="typeFilter"
+                      value={val}
+                      checked={exportForm.typeFilter === val}
+                      onChange={handleExportFormChange}
+                      aria-label={lbl}
+                    />
+                    <strong>{lbl}</strong>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {/* ── C: Date Range ── */}
+            <fieldset className="t1-export-fieldset">
+              <legend className="t1-export-legend">Date Range</legend>
+              <div className="t1-export-radio-group">
+                <label className={`t1-export-radio-label t1-export-radio-label--type ${exportForm.dateRange === 'all' ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="dateRange"
+                    value="all"
+                    checked={exportForm.dateRange === 'all'}
+                    onChange={handleExportFormChange}
+                    aria-label="All time"
+                  />
+                  <strong>All Time</strong>
+                </label>
+                <label className={`t1-export-radio-label t1-export-radio-label--type ${exportForm.dateRange === 'custom' ? 'selected' : ''}`}>
+                  <input
+                    type="radio"
+                    name="dateRange"
+                    value="custom"
+                    checked={exportForm.dateRange === 'custom'}
+                    onChange={handleExportFormChange}
+                    aria-label="Custom date range"
+                  />
+                  <strong>Custom Range</strong>
+                </label>
+              </div>
+
+              {/* Custom date pickers – only shown when 'custom' is selected */}
+              {exportForm.dateRange === 'custom' && (
+                <div className="t1-field-row t1-export-date-row">
+                  <div className="t1-field">
+                    <label htmlFor="export-start-date">Start Date</label>
+                    <input
+                      id="export-start-date"
+                      type="date"
+                      name="startDate"
+                      value={exportForm.startDate}
+                      onChange={handleExportFormChange}
+                      max={exportForm.endDate || undefined}
+                    />
+                  </div>
+                  <div className="t1-field">
+                    <label htmlFor="export-end-date">End Date</label>
+                    <input
+                      id="export-end-date"
+                      type="date"
+                      name="endDate"
+                      value={exportForm.endDate}
+                      onChange={handleExportFormChange}
+                      min={exportForm.startDate || undefined}
+                    />
+                  </div>
+                </div>
+              )}
+            </fieldset>
+
+            {/* ── Action buttons ── */}
+            <div className="t1-form-actions">
+              <button
+                type="button"
+                className="t1-btn-cancel"
+                onClick={closeExportModal}
+                disabled={exportLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="t1-btn-submit t1-btn-download"
+                onClick={handleExport}
+                disabled={exportLoading}
+                aria-busy={exportLoading}
+              >
+                {exportLoading ? (
+                  <span className="t1-export-spinner" aria-hidden="true" />
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                  </svg>
+                )}
+                {exportLoading ? 'Generating…' : 'Download Report'}
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 
