@@ -37,7 +37,6 @@ export default function SmartSubscriptionInsights2({ subscriptions }) {
               <span className="m2-insights-icon" aria-hidden="true">🧠</span>
               Smart Subscription Insights
             </h2>
-            <span className="m2-insights-badge">AI Powered</span>
           </div>
           <p className="m2-insights-subtitle">
             Automated budget run-rate analysis, category breakdown, and 7-day renewal forecast.

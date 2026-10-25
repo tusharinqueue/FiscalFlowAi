@@ -1108,18 +1108,6 @@
   line-height: 1;
 }
 
-.m2-insights-badge {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding: 3px 9px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
-  border: 1px solid rgba(167, 139, 250, 0.35);
-  color: var(--m1-accent-light, #a78bfa);
-}
-
 .m2-insights-subtitle {
   font-size: 13.5px;
   color: var(--m1-text-secondary);
