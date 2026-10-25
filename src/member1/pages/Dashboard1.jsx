@@ -13,6 +13,7 @@ import '../styles/dash1.css'
 // This MUST be the same key used in Transactions1.jsx
 // Both pages read and write to 'm1-transactions' in localStorage
 const STORAGE_KEY = 'm1-transactions'
+const SPLIT_KEY = 'm3-splitwise'
 
 // Category emoji map 
 const CATEGORY_ICONS = {
@@ -61,21 +62,18 @@ function getTodayDate() {
 // Main Component 
 export default function Dashboard1({ user }) {
 
-  //  State 
-  // transactions: holds the array we load from localStorage
   const [transactions, setTransactions] = useState([])
+  const [groups, setGroups] = useState([])
+  const [myName, setMyName] = useState('')
 
-
-  // Load from localStorage when page opens 
-  // useEffect with [] runs ONCE when the component first appears.
-  // We read from localStorage and put the data into our state.
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      // JSON.parse converts the saved string back into a JavaScript array
-      setTransactions(JSON.parse(saved))
-    }
-  }, []) // [] = run only on first render
+    if (saved) setTransactions(JSON.parse(saved))
+    const g = localStorage.getItem('m3-groups')
+    if (g) setGroups(JSON.parse(g))
+    const name = localStorage.getItem('m3-myname')
+    if (name) setMyName(name)
+  }, [])
 
 
   //   Calculate Total Income   
@@ -303,6 +301,69 @@ export default function Dashboard1({ user }) {
 
         </div>
       )}
+
+      {groups.length > 0 && (() => {
+        const allExpenses = groups.flatMap(g => g.expenses.map(e => ({ ...e, groupName: g.name })))
+        const recent = allExpenses.slice(0, 3)
+
+        let myOwed = 0, myToGet = 0
+        if (myName) {
+          groups.forEach(g => {
+            if (!g.members.includes(myName)) return
+            const bal = {}
+            g.members.forEach(m => bal[m] = 0)
+            g.expenses.forEach(exp => {
+              const share = exp.amount / exp.splitAmong.length
+              exp.splitAmong.forEach(m => {
+                if (m !== exp.paidBy) {
+                  bal[m] = (bal[m] || 0) - share
+                  bal[exp.paidBy] = (bal[exp.paidBy] || 0) + share
+                }
+              })
+            })
+            const myBal = bal[myName] || 0
+            if (myBal > 0) myToGet += myBal
+            else myOwed += Math.abs(myBal)
+          })
+        }
+
+        return (
+          <div className="d1-panel" style={{ marginTop: '20px' }}>
+            <div className="d1-panel__header">
+              <h2 className="d1-panel__title">💸 Split Expenses</h2>
+              <Link to="/splitwise" className="d1-panel__link">View All →</Link>
+            </div>
+            {myName && (myOwed > 0 || myToGet > 0) && (
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                <div style={{ flex: 1, padding: '10px 14px', background: 'rgba(248,113,113,0.1)', borderRadius: '8px', border: '1px solid var(--m1-border)' }}>
+                  <p style={{ fontSize: '11px', color: 'var(--m1-text-secondary)', margin: '0 0 2px' }}>You owe</p>
+                  <p style={{ fontSize: '16px', fontWeight: '700', color: '#f87171', margin: 0 }}>₹{myOwed.toFixed(2)}</p>
+                </div>
+                <div style={{ flex: 1, padding: '10px 14px', background: 'rgba(52,211,153,0.1)', borderRadius: '8px', border: '1px solid var(--m1-border)' }}>
+                  <p style={{ fontSize: '11px', color: 'var(--m1-text-secondary)', margin: '0 0 2px' }}>You get back</p>
+                  <p style={{ fontSize: '16px', fontWeight: '700', color: '#34d399', margin: 0 }}>₹{myToGet.toFixed(2)}</p>
+                </div>
+              </div>
+            )}
+            <div className="d1-txn-list">
+              {recent.map(exp => (
+                <div key={exp.id} className="d1-txn-row">
+                  <div className="d1-txn-row__left">
+                    <div className="d1-txn-row__icon d1-txn-row__icon--expense">💸</div>
+                    <div className="d1-txn-row__info">
+                      <span className="d1-txn-row__title">{exp.title}</span>
+                      <span className="d1-txn-row__meta">{exp.groupName} · Paid by {exp.paidBy}</span>
+                    </div>
+                  </div>
+                  <span className="d1-txn-row__amount d1-txn-row__amount--expense">
+                    ₹{exp.amount.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
     </div>
   )
