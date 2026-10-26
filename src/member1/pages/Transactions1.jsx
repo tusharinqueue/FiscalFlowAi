@@ -77,11 +77,19 @@ export default function Transactions1() {
   // If null, we are adding a new transaction.
   const [editingId, setEditingId] = useState(null)
 
-  // form: holds the current values of every input in the form
+  // ── React Form Handling State (Controlled Components) ──────────
+  // form: holds the current values of every input in the form (single source of truth)
   const [form, setForm] = useState(EMPTY_FORM)
 
-  // error: a validation error message shown inside the form
-  const [error, setError] = useState('')
+  // errors: field-specific validation error messages { title, amount, category, date, type }
+  const [errors, setErrors] = useState({})
+
+  // touched: tracks fields visited by the user to show onBlur validation feedback
+  const [touched, setTouched] = useState({})
+
+  // formError: top-level form error banner summary
+  const [formError, setFormError] = useState('')
+
 
   // ── Search / Filter / Sort state ─────────────────────────────
   // searchQuery: what the user has typed in the search bar
@@ -179,71 +187,153 @@ export default function Transactions1() {
   }
 
 
-  //   Form change handler   
-  // When any input changes, we update just that one field in the form state.
-  // e.target.name matches the `name` attribute on the input.
-  // e.target.value is what the user typed.
+  // ── Form Validation Rules ─────────────────────────────────────
+  // Validates form fields and returns an errors object mapping field names to error messages.
+  function validate(values) {
+    const errs = {}
+
+    // Title validation: required, non-empty after trim, minimum 2 characters
+    if (!values.title || !values.title.trim()) {
+      errs.title = 'Title is required.'
+    } else if (values.title.trim().length < 2) {
+      errs.title = 'Title must be at least 2 characters.'
+    }
+
+    // Amount validation: required, numeric, positive number
+    if (values.amount === '' || values.amount === null || values.amount === undefined) {
+      errs.amount = 'Amount is required.'
+    } else if (isNaN(Number(values.amount)) || Number(values.amount) <= 0) {
+      errs.amount = 'Amount must be greater than 0.'
+    }
+
+    // Type validation: must be 'income' or 'expense'
+    if (!values.type) {
+      errs.type = 'Please select Income or Expense.'
+    }
+
+    // Category validation: required
+    if (!values.category) {
+      errs.category = 'Please select a category.'
+    }
+
+    // Date validation: required, valid date format
+    if (!values.date) {
+      errs.date = 'Please select a date.'
+    }
+
+    return errs
+  }
+
+
+  // ── Controlled Form Change Handler ─────────────────────────────
+  // Single handler for all text, number, and select inputs using computed property name [e.target.name]
   function handleFormChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setForm(prev => ({ ...prev, [name]: value }))
+
+    // Clear field-level error as user starts typing to provide responsive feedback
+    if (errors[name]) {
+      setErrors(prev => {
+        const next = { ...prev }
+        delete next[name]
+        return next
+      })
+    }
+    if (formError) setFormError('')
   }
 
 
-  //   Open the form for ADDING a new transaction   
+  // ── OnBlur Handler (Touch Validation) ──────────────────────────
+  // Validates individual field when the user tabs out or leaves the input
+  function handleBlur(e) {
+    const { name } = e.target
+    setTouched(prev => ({ ...prev, [name]: true }))
+    const fieldErrors = validate(form)
+    if (fieldErrors[name]) {
+      setErrors(prev => ({ ...prev, [name]: fieldErrors[name] }))
+    }
+  }
+
+
+  // ── Type Toggle Handler ───────────────────────────────────────
+  function handleTypeToggle(newType) {
+    setForm(prev => ({ ...prev, type: newType }))
+    if (errors.type) {
+      setErrors(prev => {
+        const next = { ...prev }
+        delete next.type
+        return next
+      })
+    }
+  }
+
+
+  // ── Open Form for ADDING a new transaction ────────────────────
   function openAddForm() {
-    setEditingId(null)         // no transaction being edited
-    setForm(EMPTY_FORM)        // clear all form fields
-    setError('')               // clear any old error
-    setShowModal(true)         // show the modal
+    setEditingId(null)
+    setForm(EMPTY_FORM)
+    setErrors({})
+    setTouched({})
+    setFormError('')
+    setShowModal(true)
   }
 
 
-  //   Open the form for EDITING an existing transaction  
+  // ── Open Form for EDITING an existing transaction ─────────────
   function openEditForm(txn) {
-    setEditingId(txn.id)       // remember which transaction we are editing
-    setForm({                  // pre-fill the form with the existing values
+    setEditingId(txn.id)
+    setForm({
       title: txn.title,
-      amount: txn.amount,
+      amount: String(txn.amount),
       type: txn.type,
       category: txn.category,
       date: txn.date,
-      description: txn.description
+      description: txn.description || '',
     })
-    setError('')               // clear any old error
-    setShowModal(true)         // show the modal
+    setErrors({})
+    setTouched({})
+    setFormError('')
+    setShowModal(true)
   }
 
 
-  //   Close the modal and reset form  
+  // ── Close Modal & Reset Form State ────────────────────────────
   function closeModal() {
     setShowModal(false)
     setEditingId(null)
-    setError('')
+    setForm(EMPTY_FORM)
+    setErrors({})
+    setTouched({})
+    setFormError('')
   }
 
 
-  //   Validate the form before submitting  
-  // Returns an error message string if something is wrong, or '' if all good.
-  function validateForm() {
-    if (!form.title.trim()) return 'Title is required.'
-    if (!form.amount || Number(form.amount) <= 0) return 'Amount must be greater than 0.'
-    if (!form.type) return 'Please select Income or Expense.'
-    if (!form.category) return 'Please select a category.'
-    if (!form.date) return 'Please select a date.'
-    return '' // everything is fine
-  }
-
-
-  //   Submit the form (handles both Add and Edit)  
+  // ── Submit Handler (Controlled Form Submission & Validation) ──
   function handleSubmit(e) {
-    e.preventDefault() // stop the page from reloading
+    e.preventDefault() // 1. Stop default browser page reload
 
-    // Run validation – if there is an error, show it and stop
-    const validationError = validateForm()
-    if (validationError) {
-      setError(validationError)
+    // 2. Validate all fields
+    const validationErrors = validate(form)
+
+    if (Object.keys(validationErrors).length > 0) {
+      // Mark all fields as touched to display field-level validation errors
+      setErrors(validationErrors)
+      setTouched({
+        title: true,
+        amount: true,
+        type: true,
+        category: true,
+        date: true,
+      })
+      setFormError('Please resolve the highlighted errors before submitting.')
       return
     }
 
+    // 3. Clear errors
+    setErrors({})
+    setFormError('')
+
+    // 4. Dispatch to Redux store
     if (editingId) {
       // EDIT MODE: dispatch editTransaction action to Redux store
       dispatch(
@@ -271,9 +361,9 @@ export default function Transactions1() {
       dispatch(addTransaction(newTransaction))
     }
 
-
-    closeModal() // close and reset the form
+    closeModal() // Close modal and reset form
   }
+
 
 
   //   Delete a transaction  
@@ -865,88 +955,140 @@ export default function Transactions1() {
               <button className="t1-modal__close" onClick={closeModal} aria-label="Close">✕</button>
             </div>
 
-            {/* The form */}
-            <form onSubmit={handleSubmit}>
+            {/* Controlled Form with React Form Handling & Validation */}
+            <form onSubmit={handleSubmit} noValidate>
 
-              {/* Show error message if there is one */}
-              {error && <p className="t1-form-error">⚠ {error}</p>}
+              {/* Top-level error summary banner */}
+              {formError && <p className="t1-form-error" role="alert">⚠ {formError}</p>}
 
               {/* Title field */}
               <div className="t1-field">
-                <label>Title</label>
+                <label htmlFor="t1-title">Title</label>
                 <input
+                  id="t1-title"
                   type="text"
                   name="title"
                   value={form.title}
                   onChange={handleFormChange}
+                  onBlur={handleBlur}
+                  className={touched.title && errors.title ? 't1-input--error' : ''}
                   placeholder="e.g. Lunch, Monthly Salary"
+                  aria-invalid={touched.title && !!errors.title}
+                  aria-describedby={touched.title && errors.title ? 't1-title-error' : undefined}
                 />
+                {touched.title && errors.title && (
+                  <span id="t1-title-error" className="t1-field-error" role="alert">
+                    ⚠ {errors.title}
+                  </span>
+                )}
               </div>
 
               {/* Amount and Date side by side */}
               <div className="t1-field-row">
                 <div className="t1-field">
-                  <label>Amount (₹)</label>
+                  <label htmlFor="t1-amount">Amount (₹)</label>
                   <input
+                    id="t1-amount"
                     type="number"
                     name="amount"
                     value={form.amount}
                     onChange={handleFormChange}
+                    onBlur={handleBlur}
+                    className={touched.amount && errors.amount ? 't1-input--error' : ''}
                     placeholder="0.00"
                     min="0"
                     step="0.01"
+                    aria-invalid={touched.amount && !!errors.amount}
+                    aria-describedby={touched.amount && errors.amount ? 't1-amount-error' : undefined}
                   />
+                  {touched.amount && errors.amount && (
+                    <span id="t1-amount-error" className="t1-field-error" role="alert">
+                      ⚠ {errors.amount}
+                    </span>
+                  )}
                 </div>
                 <div className="t1-field">
-                  <label>Date</label>
+                  <label htmlFor="t1-date">Date</label>
                   <input
+                    id="t1-date"
                     type="date"
                     name="date"
                     value={form.date}
                     onChange={handleFormChange}
+                    onBlur={handleBlur}
+                    className={touched.date && errors.date ? 't1-input--error' : ''}
+                    aria-invalid={touched.date && !!errors.date}
+                    aria-describedby={touched.date && errors.date ? 't1-date-error' : undefined}
                   />
+                  {touched.date && errors.date && (
+                    <span id="t1-date-error" className="t1-field-error" role="alert">
+                      ⚠ {errors.date}
+                    </span>
+                  )}
                 </div>
               </div>
 
               {/* Type: Expense or Income toggle */}
               <div className="t1-field">
                 <label>Type</label>
-                <div className="t1-type-toggle">
+                <div className="t1-type-toggle" role="group" aria-label="Transaction Type">
                   <button
                     type="button"
                     className={`t1-type-btn ${form.type === 'expense' ? 't1-type-btn--expense' : ''}`}
-                    onClick={() => setForm({ ...form, type: 'expense' })}
+                    onClick={() => handleTypeToggle('expense')}
+                    aria-pressed={form.type === 'expense'}
                   >
                     ↓ Expense
                   </button>
                   <button
                     type="button"
                     className={`t1-type-btn ${form.type === 'income' ? 't1-type-btn--income' : ''}`}
-                    onClick={() => setForm({ ...form, type: 'income' })}
+                    onClick={() => handleTypeToggle('income')}
+                    aria-pressed={form.type === 'income'}
                   >
                     ↑ Income
                   </button>
                 </div>
+                {touched.type && errors.type && (
+                  <span className="t1-field-error" role="alert">
+                    ⚠ {errors.type}
+                  </span>
+                )}
               </div>
 
               {/* Category dropdown */}
               <div className="t1-field">
-                <label>Category</label>
-                <select name="category" value={form.category} onChange={handleFormChange}>
+                <label htmlFor="t1-category">Category</label>
+                <select
+                  id="t1-category"
+                  name="category"
+                  value={form.category}
+                  onChange={handleFormChange}
+                  onBlur={handleBlur}
+                  className={touched.category && errors.category ? 't1-input--error' : ''}
+                  aria-invalid={touched.category && !!errors.category}
+                  aria-describedby={touched.category && errors.category ? 't1-category-error' : undefined}
+                >
                   <option value="">Select a category</option>
                   {/* map() generates one <option> per category */}
                   {CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
+                {touched.category && errors.category && (
+                  <span id="t1-category-error" className="t1-field-error" role="alert">
+                    ⚠ {errors.category}
+                  </span>
+                )}
               </div>
 
               {/* Description (optional) */}
               <div className="t1-field">
-                <label>
+                <label htmlFor="t1-description">
                   Description <span className="t1-optional">(optional)</span>
                 </label>
                 <input
+                  id="t1-description"
                   type="text"
                   name="description"
                   value={form.description}
@@ -966,6 +1108,7 @@ export default function Transactions1() {
               </div>
 
             </form>
+
           </div>
         </div>
       )}
