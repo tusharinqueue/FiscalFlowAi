@@ -1,7 +1,14 @@
 // TransactionsPage1.jsx – Route wrapper for Transactions1
-// Transactions1 manages its own state and localStorage, so no props are needed.
+// Redux Provider is integrated here to scope Redux Toolkit specifically to the Transactions feature.
+import { Provider } from 'react-redux'
+import store from '../../redux/store'
 import Transactions1 from './Transactions1'
 
 export default function TransactionsPage1() {
-  return <Transactions1 />
+  return (
+    <Provider store={store}>
+      <Transactions1 />
+    </Provider>
+  )
 }
+
