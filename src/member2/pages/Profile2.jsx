@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../shared/hooks/useAuth'
+import { DEFAULT_USER_PROFILE } from '../../shared/constants/user'
 import { useLocalStorage2 } from '../hooks/useLocalStorage2'
 import ProfileDetailsCard2 from '../components/ProfileDetailsCard2'
 import ProfileSubscriptionSummary2 from '../components/ProfileSubscriptionSummary2'
@@ -7,17 +9,13 @@ import { calculateMonthlySpend } from '../utils/subscriptionUtils2'
 import '../../member1/styles/theme1.css'
 import '../styles/profile2.css'
 
-const DEFAULT_PROFILE = {
-  name: '',
-  email: '',
-  phone: '',
-  currency: 'INR (₹)',
-  monthlyBudget: '',
-  occupation: ''
-}
-
 export default function Profile2() {
-  const [storedUser, setStoredUser] = useLocalStorage2('m1-user', DEFAULT_PROFILE)
+  const { user, updateProfile } = useAuth()
+  const userProfile = useMemo(() => ({
+    ...DEFAULT_USER_PROFILE,
+    ...(user || {})
+  }), [user])
+
   const [subscriptions] = useLocalStorage2('subscriptions', [])
   const [groups, setGroups] = useState([])
   const [myName, setMyName] = useState('')
@@ -38,13 +36,14 @@ export default function Profile2() {
   }, [])
 
   const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState({
-    ...DEFAULT_PROFILE,
-    ...storedUser
-  })
+  const [formData, setFormData] = useState(userProfile)
   const [message, setMessage] = useState({ error: '', success: '' })
 
-  const userProfile = { ...DEFAULT_PROFILE, ...storedUser }
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData(userProfile)
+    }
+  }, [userProfile, isEditing])
 
   // Compute active subscription metrics using shared util
   const summary = useMemo(() => {
@@ -101,7 +100,7 @@ export default function Profile2() {
       return
     }
 
-    setStoredUser({
+    updateProfile({
       ...userProfile,
       ...formData,
       name: formData.name.trim(),

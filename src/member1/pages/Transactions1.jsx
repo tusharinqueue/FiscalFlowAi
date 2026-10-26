@@ -2,6 +2,7 @@
 // All logic is in this one file: Add, Edit, Delete, localStorage, validation, Export
 
 import { useState, useEffect } from 'react'
+import { useTransactions } from '../../shared/hooks/useTransactions'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import '../styles/theme1.css'
@@ -16,9 +17,6 @@ const SORT_OPTIONS = [
 ]
 
 // Constants  
-// The key we use to save/load transactions from localStorage
-const STORAGE_KEY = 'm1-transactions'
-
 // List of categories the user can choose from
 const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Salary', 'Other']
 
@@ -55,10 +53,16 @@ const EXPORT_FORM_DEFAULT = {
 
 export default function Transactions1() {
 
-  //  State   
-
-  // transactions: the main list of all transactions
-  const [transactions, setTransactions] = useState([])
+  // Consume authoritative transaction state & CRUD operations from context
+  const {
+    transactions,
+    addTransaction,
+    editTransaction,
+    deleteTransaction,
+    totalIncome,
+    totalExpense,
+    balance
+  } = useTransactions()
 
   // showModal: true = the Add/Edit form is visible, false = it is hidden
   const [showModal, setShowModal] = useState(false)
@@ -95,25 +99,6 @@ export default function Transactions1() {
   const [exportSuccess, setExportSuccess] = useState('')
 
 
-  //   Load from localStorage on first render   
-  // useEffect with [] runs only ONCE when the component first appears on screen.
-  // We check if any transactions were saved previously and load them into state.
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      setTransactions(JSON.parse(saved))
-    }
-  }, []) // empty [] = run only on first render
-
-
-  //   Save to localStorage whenever transactions changes  
-  // useEffect with [transactions] runs every time the transactions array changes.
-  // This keeps localStorage always up to date with the latest state.
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
-  }, [transactions]) // runs whenever transactions changes
-
-
   //   Close the detail drawer when Escape is pressed  
   // The dependency array [selectedTxn] means this effect re-runs every time
   // selectedTxn changes.  When the drawer opens we attach the listener; the
@@ -126,21 +111,6 @@ export default function Transactions1() {
     if (selectedTxn) document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [selectedTxn])
-
-
-  //   Summary calculations   
-  // filter() picks only income transactions, reduce() adds up their amounts
-  const totalIncome = transactions
-    .filter(t => t.type === 'income')
-    .reduce((sum, t) => sum + t.amount, 0)
-
-  // Same for expenses
-  const totalExpense = transactions
-    .filter(t => t.type === 'expense')
-    .reduce((sum, t) => sum + t.amount, 0)
-
-  // Balance = income minus expenses
-  const balance = totalIncome - totalExpense
 
   // ── Derived: filtered + sorted transactions ───────────────────
   // We NEVER store these in state – they are computed fresh on every render.
@@ -239,39 +209,27 @@ export default function Transactions1() {
     }
 
     if (editingId) {
-      //   EDIT MODE: replace the old transaction with updated values  
-      // map() goes through every transaction. When we find the one with
-      // the matching id, we replace it. All others stay the same.
-      const updatedList = transactions.map(txn => {
-        if (txn.id === editingId) {
-          // Return an updated version of this transaction
-          return {
-            ...txn,                           // keep id
-            title: form.title.trim(),
-            amount: parseFloat(form.amount),  // convert string to number
-            type: form.type,
-            category: form.category,
-            date: form.date,
-            description: form.description.trim()
-          }
-        }
-        return txn // leave all other transactions unchanged
-      })
-      setTransactions(updatedList)
-
-    } else {
-      //   ADD MODE: create a brand new transaction object  
-      const newTransaction = {
-        id: Date.now().toString(),          // simple unique id using timestamp
+      //   EDIT MODE: update transaction via context
+      editTransaction(editingId, {
         title: form.title.trim(),
-        amount: parseFloat(form.amount),    // convert string "450" to number 450
+        amount: parseFloat(form.amount),
+        type: form.type,
+        category: form.category,
+        date: form.date,
+        description: form.description.trim()
+      })
+    } else {
+      //   ADD MODE: add new transaction via context
+      const newTransaction = {
+        id: Date.now().toString(),
+        title: form.title.trim(),
+        amount: parseFloat(form.amount),
         type: form.type,
         category: form.category,
         date: form.date,
         description: form.description.trim()
       }
-      // Add the new transaction to the FRONT of the list (newest first)
-      setTransactions([newTransaction, ...transactions])
+      addTransaction(newTransaction)
     }
 
     closeModal() // close and reset the form
@@ -284,7 +242,7 @@ export default function Transactions1() {
   const [itemToDelete, setItemToDelete] = useState(null)
 
   function confirmDelete(id) {
-    setTransactions(transactions.filter(txn => txn.id !== id))
+    deleteTransaction(id)
     setItemToDelete(null)
   }
 

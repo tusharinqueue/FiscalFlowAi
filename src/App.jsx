@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from './shared/context/AuthContext'
+import { TransactionsProvider } from './shared/context/TransactionsContext'
 
 // Member 1 imports
 import Member1Layout from './member1/components/Member1Layout'
@@ -20,40 +22,44 @@ import GoalDetailsPage4 from './member4/pages/GoalDetailsPage4'
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage1 />} />
+      <AuthProvider>
+        <TransactionsProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage1 />} />
 
-        {/* Protected routes wrapped in shared layout */}
-        <Route path="/" element={<Member1Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<DashboardPage1 />} />
-          <Route path="transactions" element={<TransactionsPage1 />} />
-          <Route path="subscriptions" element={<SubscriptionsPage2 />} />
-          <Route path="profile" element={<ProfilePage2 />} />
-          <Route path="splitwise" element={<SplitwisePage />} />
-          <Route path="goals" element={<GoalsPage4 />} />
-          <Route path="goals/:id" element={<GoalDetailsPage4 />} />
-        </Route>
+            {/* Protected routes wrapped in shared layout */}
+            <Route path="/" element={<Member1Layout />}>
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardPage1 />} />
+              <Route path="transactions" element={<TransactionsPage1 />} />
+              <Route path="subscriptions" element={<SubscriptionsPage2 />} />
+              <Route path="profile" element={<ProfilePage2 />} />
+              <Route path="splitwise" element={<SplitwisePage />} />
+              <Route path="goals" element={<GoalsPage4 />} />
+              <Route path="goals/:id" element={<GoalDetailsPage4 />} />
+            </Route>
 
-        {/* Dedicated direct /subscriptions route */}
-        <Route
-          path="/subscriptions"
-          element={<Navigate to="/subscriptions" replace />}
-        />
+            {/* Dedicated direct /subscriptions route */}
+            <Route
+              path="/subscriptions"
+              element={<Navigate to="/subscriptions" replace />}
+            />
 
-        {/* catch all route for 404 */}
-        <Route
-          path="*"
-          element={
-            <div style={{ textAlign: 'center', padding: '50px', color: 'white' }}>
-              <h2>404 - Not Found</h2>
-              <a href="/dashboard" style={{ color: '#a78bfa' }}>
-                Go to Dashboard
-              </a>
-            </div>
-          }
-        />
-      </Routes>
+            {/* catch all route for 404 */}
+            <Route
+              path="*"
+              element={
+                <div style={{ textAlign: 'center', padding: '50px', color: 'white' }}>
+                  <h2>404 - Not Found</h2>
+                  <a href="/dashboard" style={{ color: '#a78bfa' }}>
+                    Go to Dashboard
+                  </a>
+                </div>
+              }
+            />
+          </Routes>
+        </TransactionsProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

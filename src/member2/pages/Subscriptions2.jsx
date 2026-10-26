@@ -1,18 +1,15 @@
 import { useMemo, useState } from 'react'
+import { useTransactions } from '../../shared/hooks/useTransactions'
 import { useLocalStorage2 } from '../hooks/useLocalStorage2'
 import DeleteConfirmModal2 from '../components/DeleteConfirmModal2'
 import SubscriptionCard2 from '../components/SubscriptionCard2'
 import SubscriptionFilters2 from '../components/SubscriptionFilters2'
 import SubscriptionModal2 from '../components/SubscriptionModal2'
-import SubscriptionStats2 from '../components/SubscriptionStats2'
 import SmartSubscriptionInsights2 from '../components/SmartSubscriptionInsights2'
 import UpcomingRenewals2 from '../components/UpcomingRenewals2'
 import {
   calculateNextRenewalDate,
-  calculateMonthlySpend,
   getDaysUntilRenewal,
-  syncSubscriptionTransaction,
-  removeSubscriptionTransaction,
   INITIAL_FORM_STATE
 } from '../utils/subscriptionUtils2'
 import '../../member1/styles/theme1.css'
@@ -50,18 +47,16 @@ function validateSubscription(formData) {
 }
 
 export default function Subscriptions2() {
+  const {
+    syncSubscriptionTransaction: syncTxn,
+    removeSubscriptionTransaction: removeTxn
+  } = useTransactions()
   const [subscriptions, setSubscriptions] = useLocalStorage2('subscriptions', [])
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   const [modal, setModal] = useState(INITIAL_MODAL)
   const [subscriptionToDelete, setSubscriptionToDelete] = useState(null)
 
   const { searchTerm, category, status, cycle } = filters
-
-  // Key metrics: active count & estimated monthly spend
-  const stats = useMemo(() => ({
-    activeCount: subscriptions.filter(sub => sub.status === 'Active').length,
-    monthlyCost: calculateMonthlySpend(subscriptions)
-  }), [subscriptions])
 
   // Active subscriptions sorted by renewal urgency
   const activeRenewals = useMemo(() => {
@@ -169,8 +164,8 @@ export default function Subscriptions2() {
         : [subscription, ...current]
     )
 
-    // Sync linked transaction with Member 1 transactions
-    syncSubscriptionTransaction(subscription, Boolean(editingId))
+    // Sync linked transaction with Member 1 transactions via context
+    syncTxn(subscription, Boolean(editingId))
 
     closeModal()
   }
@@ -180,8 +175,8 @@ export default function Subscriptions2() {
       current.filter(subscription => String(subscription.id) !== String(id))
     )
 
-    // Remove linked transaction from Member 1 transactions
-    removeSubscriptionTransaction(id)
+    // Remove linked transaction from Member 1 transactions via context
+    removeTxn(id)
 
     setSubscriptionToDelete(null)
   }
@@ -208,14 +203,6 @@ export default function Subscriptions2() {
           Add Subscription
         </button>
       </header>
-
-      {subscriptions.length > 0 && (
-        <SubscriptionStats2
-          activeCount={stats.activeCount}
-          totalCount={subscriptions.length}
-          monthlyEstimatedCost={stats.monthlyCost}
-        />
-      )}
 
       {subscriptions.length > 0 && (
         <SmartSubscriptionInsights2 subscriptions={subscriptions} />
