@@ -6,14 +6,9 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTransactions } from '../../shared/hooks/useTransactions'
 import '../styles/theme1.css'
 import '../styles/dash1.css'
-
-// Storage key 
-// This MUST be the same key used in Transactions1.jsx
-// Both pages read and write to 'm1-transactions' in localStorage
-const STORAGE_KEY = 'm1-transactions'
-const SPLIT_KEY = 'm3-splitwise'
 
 // Category emoji map 
 const CATEGORY_ICONS = {
@@ -58,42 +53,31 @@ function getTodayDate() {
   })
 }
 
-
 // Main Component 
 export default function Dashboard1({ user }) {
+  // Consume authoritative transactions and summary metrics from TransactionsContext
+  const {
+    transactions,
+    totalIncome,
+    totalExpense: totalExpenses,
+    balance: totalBalance
+  } = useTransactions()
 
-  const [transactions, setTransactions] = useState([])
   const [groups, setGroups] = useState([])
   const [myName, setMyName] = useState('')
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) setTransactions(JSON.parse(saved))
     const g = localStorage.getItem('m3-groups')
-    if (g) setGroups(JSON.parse(g))
+    if (g) {
+      try {
+        setGroups(JSON.parse(g))
+      } catch {
+        setGroups([])
+      }
+    }
     const name = localStorage.getItem('m3-myname')
     if (name) setMyName(name)
   }, [])
-
-
-  //   Calculate Total Income   
-  // Step 1: filter() keeps only income transactions
-  // Step 2: reduce() adds up all their amounts starting from 0
-  const totalIncome = transactions
-    .filter(transaction => transaction.type === 'income')
-    .reduce((total, transaction) => total + transaction.amount, 0)
-
-
-  //   Calculate Total Expenses  
-  // Same idea: filter for expense transactions, then add them up
-  const totalExpenses = transactions
-    .filter(transaction => transaction.type === 'expense')
-    .reduce((total, transaction) => total + transaction.amount, 0)
-
-
-  //   Calculate Total Balance  
-  // Balance = what you earned minus what you spent
-  const totalBalance = totalIncome - totalExpenses
 
 
   //   Calculate Savings  

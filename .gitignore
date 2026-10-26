@@ -48,3 +48,8 @@ coverage/
 # deployments
 .vercel/
 .netlify/
+
+# agent files
+.agent/
+.agents/
+.gemini/

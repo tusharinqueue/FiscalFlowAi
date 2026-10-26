@@ -1128,15 +1128,97 @@
   flex-shrink: 0;
 }
 
-/* ── Responsive: stack header actions on very small screens ─────── */
-@media (max-width: 400px) {
+/* ── Responsive rules ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .t1-page {
+    gap: 20px;
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .t1-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
   .t1-header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     width: 100%;
   }
-  .t1-btn-export,
-  .t1-btn-add {
-    flex: 1;
+  .t1-btn-add,
+  .t1-btn-export {
+    flex: 1 1 calc(50% - 4px);
     justify-content: center;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  .t1-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .t1-search-wrap {
+    width: 100%;
+    flex: none;
+  }
+  .t1-filter-group {
+    width: 100%;
+    display: flex;
+  }
+  .t1-filter-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+  }
+  .t1-sort-wrap {
+    width: 100%;
+  }
+  .t1-sort-select {
+    width: 100%;
+  }
+  .t1-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 14px;
+  }
+  .t1-item__right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-top: 1px dashed var(--m1-border);
+    padding-top: 10px;
+  }
+  .t1-item__amount {
+    text-align: left;
+    min-width: auto;
+  }
+  .t1-modal,
+  .t1-details-modal,
+  .t1-export-modal {
+    width: 94vw !important;
+    max-width: 94vw !important;
+    padding: 20px 16px !important;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .t1-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 440px) {
+  .t1-btn-add,
+  .t1-btn-export {
+    flex: 1 1 100%;
+  }
+  .t1-summary {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
   .t1-export-radio-group {
     flex-direction: column;
@@ -1144,12 +1226,6 @@
   .t1-export-radio-label,
   .t1-export-radio-label--type {
     min-width: unset;
-  }
-}
-
-@media (max-width: 480px) {
-  .t1-export-modal {
-    padding: 20px 16px;
   }
 }
 

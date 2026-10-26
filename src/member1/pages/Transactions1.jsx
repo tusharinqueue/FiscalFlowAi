@@ -87,7 +87,6 @@ export default function Transactions1() {
   // searchQuery: what the user has typed in the search bar
   const [searchQuery, setSearchQuery] = useState('')
 
-
   // typeFilter: which type to show – 'all' | 'income' | 'expense'
   const [typeFilter, setTypeFilter] = useState('all')
 
@@ -119,20 +118,6 @@ export default function Transactions1() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
   }, [transactions])
 
-
-
-  //   Close the detail drawer when Escape is pressed  
-  // The dependency array [selectedTxn] means this effect re-runs every time
-  // selectedTxn changes.  When the drawer opens we attach the listener; the
-  // cleanup return removes it when the drawer closes or the component unmounts
-  // – this prevents a memory leak from stale event listeners.
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') setSelectedTxn(null)
-    }
-    if (selectedTxn) document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [selectedTxn])
 
 
   //   Close the detail drawer when Escape is pressed  

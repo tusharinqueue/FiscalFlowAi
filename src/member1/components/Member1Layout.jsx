@@ -3,15 +3,15 @@
 // Transactions state is NO longer here – each page manages its own state.
 
 import { Outlet, Navigate } from 'react-router-dom'
-import { useLocalStorage1 } from '../hooks/useLocalStorage1'
+import { useAuth } from '../../shared/hooks/useAuth'
 import { useTheme1 } from '../hooks/useTheme1'
 import Navbar1 from './Navbar1'
 import '../styles/theme1.css'
 import '../styles/transactions1.css'
 
 export default function Member1Layout() {
-  // user: stored in localStorage so the session persists across refreshes
-  const [user] = useLocalStorage1('m1-user', null)
+  // user: from reactive AuthContext
+  const { user } = useAuth()
 
   // theme: 'dark' or 'light', also persisted in localStorage
   const [theme, toggleTheme] = useTheme1()

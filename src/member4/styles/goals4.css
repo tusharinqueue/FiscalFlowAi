@@ -499,3 +499,266 @@
   opacity: 1;
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* Milestone Stepper */
+.milestones-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #2a3555;
+}
+.milestone-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 6px;
+  background: #101322;
+  border: 1px solid #2a3555;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.milestone-step.active {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: #34d399;
+}
+.milestone-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2a3555;
+  color: #8899bb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.milestone-step.active .milestone-badge {
+  background: #34d399;
+  color: #0b1329;
+}
+.milestone-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8899bb;
+  margin-bottom: 2px;
+}
+.milestone-step.active .milestone-label {
+  color: #f0f0f0;
+}
+.milestone-amt {
+  font-size: 11px;
+  color: #8899bb;
+}
+.milestone-step.active .milestone-amt {
+  color: #34d399;
+  font-weight: 600;
+}
+
+/* Preset Deposit Buttons */
+.deposit-preset-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.btn-preset {
+  flex: 1;
+  background: #101322;
+  border: 1px solid #2a3555;
+  color: #34d399;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+.btn-preset:hover:not(:disabled) {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: #34d399;
+}
+.btn-preset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.history-note {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f0f0f0;
+  margin-bottom: 2px;
+}
+
+/* What-If Simulator */
+.simulator-card {
+  background: #1a1a2e;
+  border: 1px solid #2a3555;
+  border-radius: 10px;
+  padding: 24px;
+  margin-top: 24px;
+}
+.simulator-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.simulator-header h3 {
+  font-size: 18px;
+  color: #f0f0f0;
+}
+.ai-tag {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+.simulator-slider-box {
+  background: #101322;
+  border: 1px solid #2a3555;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.slider-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-bottom: 12px;
+}
+.slider-amt {
+  font-size: 18px;
+  font-weight: 700;
+  color: #a78bfa;
+}
+.sim-slider {
+  width: 100%;
+  accent-color: #6366f1;
+  cursor: pointer;
+}
+.sim-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sim-stat {
+  background: #101322;
+  border: 1px solid #2a3555;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+.sim-stat-lbl {
+  font-size: 11px;
+  color: #8899bb;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sim-stat-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+.sim-stat-val.highlight {
+  color: #a78bfa;
+}
+.sim-insight-banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.sim-insight-banner.ahead {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+.sim-insight-banner.behind {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+.sim-insight-banner.ontrack, .sim-insight-banner.completed {
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+}
+
+/* ── Mobile Responsive Rules for Member 4 Goals ────────────── */
+@media (max-width: 768px) {
+  .goals-container {
+    padding: 16px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .goals-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .goals-header .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+  .goals-summary {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-content {
+    padding: 20px 16px;
+    width: 92vw;
+    max-height: 88vh;
+  }
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+  .investment-section {
+    padding: 18px 16px;
+  }
+  .investment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .goal-alert {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .alert-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .milestones-stepper {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sim-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .timeframe-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .modal-actions button {
+    width: 100%;
+    text-align: center;
+  }
+}
+

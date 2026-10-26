@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useLocalStorage1 } from '../hooks/useLocalStorage1'
+import { useAuth } from '../../shared/hooks/useAuth'
 import LoginModal1 from '../components/LoginModal1'
 import '../styles/theme1.css'
 
 export default function LoginPage1() {
-  const [user, setUser] = useLocalStorage1('m1-user', null)
+  const { user, login } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export default function LoginPage1() {
   }, [user, navigate])
 
   function handleLogin(userData) {
-    setUser(userData)
+    login(userData)
     // The useEffect will automatically catch the user state change and redirect to /dashboard
   }
 
