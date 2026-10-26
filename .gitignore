@@ -51,4 +51,5 @@ coverage/
 
 # agent files
 .agent/
-
+.agents/
+.gemini/

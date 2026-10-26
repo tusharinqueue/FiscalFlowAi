@@ -1,16 +1,26 @@
+/* ================================================================
+   splitwise.css – Splitwise feature styles (Member 3)
+   Enhanced with:
+     - /onboard: Engaging empty states and template chips
+     - /colorize: Semantic status badges and gradient cards
+     - /animate: Micro-interactions and smooth reveals
+     - /adapt: Responsive touch targets and mobile layouts
+   ================================================================ */
+
 .m3-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding-bottom: 48px;
-  animation: m3FadeIn 0.3s ease-in;
+  animation: m3FadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes m3FadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Header ───────────────────────────────────────────────────── */
 .m3-header {
   display: flex;
   justify-content: space-between;
@@ -34,25 +44,31 @@
 }
 
 .m3-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   color: var(--m1-accent-light, #a78bfa);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  padding: 0;
-  margin-bottom: 6px;
+  padding: 4px 0;
+  margin-bottom: 8px;
   font-family: inherit;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 .m3-back-btn:hover {
-  opacity: 0.8;
+  opacity: 0.85;
+  transform: translateX(-3px);
 }
 
+/* ── Navigation Tabs ──────────────────────────────────────────── */
 .m3-tabs {
   display: flex;
-  gap: 8px;
-  border-bottom: 1px solid var(--m1-border);
+  gap: 10px;
+  border-bottom: 1.5px solid var(--m1-border);
   padding-bottom: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -64,19 +80,23 @@
 }
 
 .m3-tab {
-  padding: 10px 18px;
+  padding: 10px 22px;
   background: none;
   border: none;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2.5px solid transparent;
   color: var(--m1-text-secondary);
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  margin-bottom: -1px;
+  margin-bottom: -1.5px;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.m3-tab:hover {
+  color: var(--m1-text-primary);
 }
 
 .m3-tab--active {
@@ -84,107 +104,373 @@
   border-bottom-color: var(--m1-accent-light, #a78bfa);
 }
 
+/* ── Section Cards ────────────────────────────────────────────── */
 .m3-section {
   background: var(--m1-bg-card);
   border: 1px solid var(--m1-border);
-  border-radius: 16px;
-  padding: 22px 24px;
+  border-radius: 18px;
+  padding: 24px;
   box-shadow: var(--m1-shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s ease;
 }
 
 .m3-section h2 {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--m1-text-primary);
   margin: 0 0 16px 0;
+  letter-spacing: -0.01em;
 }
 
-.m3-empty p {
-  color: var(--m1-text-secondary);
-  font-size: 14px;
+.m3-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.m3-section-head h2 {
+  margin-bottom: 0;
+}
+
+.m3-badge-pill {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--m1-accent-light, #a78bfa);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.m3-badge-pill--green {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* ── Onboarding & Empty States (/onboard) ───────────────────────── */
+.m3-onboarding-card {
   text-align: center;
+  padding: 44px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.m3-onboard-icon-badge {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--m1-accent-light, #a78bfa);
+  font-size: 24px;
+  margin-bottom: 4px;
+  box-shadow: 0 4px 16px var(--m1-accent-glow);
+}
+
+.m3-onboard-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
   margin: 0;
 }
 
-.m3-error {
-  color: var(--m1-expense, #f87171);
-  font-size: 13px;
-  margin-bottom: 10px;
+.m3-onboard-sub {
+  font-size: 14px;
+  color: var(--m1-text-secondary);
+  max-width: 440px;
+  line-height: 1.5;
+  margin: 0;
 }
 
+.m3-starter-chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.m3-starter-label {
+  font-size: 12px;
+  color: var(--m1-text-secondary);
+  font-weight: 600;
+}
+
+.m3-chip-btn {
+  background: var(--m1-bg-card-hover, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--m1-border-strong);
+  color: var(--m1-text-primary);
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.m3-chip-btn:hover {
+  background: rgba(124, 58, 237, 0.16);
+  border-color: var(--m1-accent-light);
+  color: var(--m1-accent-light);
+  transform: translateY(-1px);
+}
+
+.m3-onboarding-hint {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(124, 58, 237, 0.08);
+  border: 1px dashed rgba(124, 58, 237, 0.35);
+  padding: 16px 20px;
+}
+
+.m3-hint-icon {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+
+.m3-hint-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m1-accent-light);
+  margin: 0 0 2px 0;
+}
+
+.m3-hint-sub {
+  font-size: 13px;
+  color: var(--m1-text-secondary);
+  margin: 0;
+}
+
+/* ── Error Text ───────────────────────────────────────────────── */
+.m3-error {
+  color: var(--m1-expense, #f87171);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+/* ── Group List & Cards (/colorize & /animate) ────────────────── */
 .m3-group-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .m3-group-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 16px 20px;
   background: var(--m1-input-bg);
-  border: 1px solid var(--m1-border);
-  border-radius: 12px;
+  border: 1.5px solid var(--m1-border);
+  border-radius: 14px;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  animation: m3CardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes m3CardIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .m3-group-card:hover {
   border-color: var(--m1-accent-light, #a78bfa);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .m3-group-card__left {
   display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.m3-group-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--m1-accent), #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.m3-group-info {
+  display: flex;
   flex-direction: column;
   gap: 3px;
+  min-width: 0;
 }
 
 .m3-group-card__name {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 700;
   color: var(--m1-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .m3-group-card__meta {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--m1-text-secondary);
 }
 
 .m3-group-card__right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
 .m3-group-card__total {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 800;
   color: var(--m1-accent-light, #a78bfa);
 }
 
+/* ── Member Input & Member Tags ───────────────────────────────── */
+.member-row {
+  display: flex;
+  gap: 10px;
+}
+
+.member-row input {
+  flex: 1;
+  padding: 11px 16px;
+  background: var(--m1-input-bg);
+  border: 1.5px solid var(--m1-input-border);
+  border-radius: 10px;
+  color: var(--m1-text-primary);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.member-row input:focus {
+  outline: none;
+  border-color: var(--m1-accent);
+  box-shadow: 0 0 0 3px var(--m1-accent-glow);
+}
+
+.btn-add-member {
+  padding: 11px 22px;
+  background: var(--m1-accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 2px 10px var(--m1-accent-glow);
+}
+
+.btn-add-member:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-add-member:active {
+  transform: scale(0.98);
+}
+
+.member-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 0;
+}
+
+.member-tags li {
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: var(--m1-text-primary);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  animation: m3TagIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes m3TagIn {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.member-tags button {
+  background: none;
+  border: none;
+  color: var(--m1-expense, #f87171);
+  cursor: pointer;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.member-tags button:hover {
+  opacity: 1;
+}
+
+/* ── Add Expense Form (/adapt & /colorize) ─────────────────────── */
 .m3-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .m3-form input,
 .m3-form select {
-  padding: 10px 14px;
+  padding: 11px 16px;
   background: var(--m1-input-bg);
   border: 1.5px solid var(--m1-input-border);
-  border-radius: 8px;
+  border-radius: 10px;
   color: var(--m1-text-primary);
   font-size: 14px;
   font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .m3-form input:focus,
 .m3-form select:focus {
   outline: none;
   border-color: var(--m1-accent);
+  box-shadow: 0 0 0 3px var(--m1-accent-glow);
 }
 
 .m3-form select option {
@@ -196,38 +482,73 @@
   font-size: 13px;
   font-weight: 600;
   color: var(--m1-text-secondary);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .m3-checkboxes {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .m3-checkbox-label {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--m1-text-secondary);
+  cursor: pointer;
+  padding: 8px 14px;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--m1-border);
+  background: var(--m1-input-bg);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.m3-checkbox-label:hover {
+  border-color: var(--m1-border-strong);
   color: var(--m1-text-primary);
+}
+
+.m3-checkbox-label.selected {
+  border-color: var(--m1-accent);
+  background: rgba(124, 58, 237, 0.14);
+  color: var(--m1-accent-light);
+  font-weight: 600;
+}
+
+.m3-checkbox-label input[type="checkbox"] {
+  accent-color: var(--m1-accent);
   cursor: pointer;
 }
 
 .m3-btn-add {
-  padding: 11px;
+  margin-top: 4px;
+  padding: 12px 20px;
   background: linear-gradient(135deg, var(--m1-accent) 0%, #6366f1 100%);
-  color: #fff;
+  color: #ffffff;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
+  box-shadow: 0 4px 14px var(--m1-accent-glow);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.m3-btn-add:hover { opacity: 0.9; }
+.m3-btn-add:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
 
+.m3-btn-add:active {
+  transform: scale(0.98);
+}
+
+/* ── Expenses List ────────────────────────────────────────────── */
 .m3-expense-list {
   display: flex;
   flex-direction: column;
@@ -238,22 +559,52 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 16px;
   background: var(--m1-input-bg);
   border: 1px solid var(--m1-border);
-  border-radius: 10px;
+  border-radius: 12px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+  animation: m3CardIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.m3-expense-item:hover {
+  border-color: var(--m1-border-strong);
+  transform: translateY(-1px);
 }
 
 .m3-expense-left {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.m3-expense-badge-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.m3-expense-info {
+  display: flex;
   flex-direction: column;
   gap: 3px;
+  min-width: 0;
 }
 
 .m3-expense-title {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 600;
   color: var(--m1-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .m3-expense-meta {
@@ -265,10 +616,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .m3-expense-amount {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: 700;
   color: var(--m1-accent-light, #a78bfa);
 }
@@ -276,28 +628,155 @@
 .m3-btn-delete {
   background: none;
   border: none;
-  color: var(--m1-expense, #f87171);
-  font-size: 18px;
+  color: var(--m1-text-muted);
   cursor: pointer;
-  padding: 0;
-  line-height: 1;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 }
 
-.m3-settlement {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--m1-border);
-  font-size: 14px;
+.m3-btn-delete:hover {
+  color: var(--m1-expense, #f87171);
+  background: rgba(239, 68, 68, 0.12);
 }
 
-.m3-settlement:last-child { border-bottom: none; }
+/* ── Settlements Grid (/colorize & /adapt) ─────────────────────── */
+.m3-settlements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
 
-.m3-arrow { color: var(--m1-text-secondary); }
+.m3-settlement-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--m1-input-bg);
+  border: 1px solid var(--m1-border);
+  border-radius: 12px;
+  transition: border-color 0.15s ease;
+}
 
-.m3-owe-amount {
+.m3-settlement-parties {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.m3-party-badge {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+.m3-party-badge--debtor {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.m3-party-badge--creditor {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.m3-settlement-arrow {
+  color: var(--m1-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m3-settlement-val {
+  font-size: 15px;
   font-weight: 700;
   color: var(--m1-text-primary);
+  flex-shrink: 0;
 }
 
+/* ── Individual Balances Grid ─────────────────────────────────── */
+.m3-balances-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.m3-balance-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--m1-input-bg);
+  border: 1px solid var(--m1-border);
+  border-radius: 12px;
+}
+
+.m3-balance-card__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.m3-balance-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--m1-bg-card-hover, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--m1-border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  flex-shrink: 0;
+}
+
+.m3-balance-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--m1-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m3-bal-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.m3-bal-tag--positive {
+  background: rgba(16, 185, 129, 0.14);
+  color: #34d399;
+}
+
+.m3-bal-tag--negative {
+  background: rgba(239, 68, 68, 0.14);
+  color: #f87171;
+}
+
+.m3-bal-tag--neutral {
+  background: var(--m1-input-bg);
+  color: var(--m1-text-muted);
+}
+
+/* ── "Me" Tab Section ─────────────────────────────────────────── */
 .m3-me-section {
   display: flex;
   flex-direction: column;
@@ -307,56 +786,76 @@
 .m3-me-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.m3-me-header h2 {
-  margin-bottom: 0 !important;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .m3-change-name {
   background: none;
-  border: 1px solid var(--m1-border);
+  border: 1px solid var(--m1-border-strong);
   color: var(--m1-text-secondary);
-  font-size: 12px;
-  padding: 5px 10px;
-  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
   cursor: pointer;
   font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.m3-change-name:hover {
+  background: rgba(124, 58, 237, 0.12);
+  border-color: var(--m1-accent-light);
+  color: var(--m1-accent-light);
 }
 
 .m3-me-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 14px;
 }
 
 .m3-me-card {
-  padding: 16px;
-  border-radius: 12px;
+  padding: 20px 18px;
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  border: 1px solid var(--m1-border);
+  border: 1.5px solid var(--m1-border);
+  background: var(--m1-input-bg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.m3-me-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .m3-me-card__label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--m1-text-secondary);
 }
 
 .m3-me-card__value {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  color: var(--m1-text-primary);
+}
+
+.m3-me-card__sub {
+  font-size: 12px;
+  color: var(--m1-text-muted);
 }
 
 .m3-me-card--owed {
-  background: var(--m1-expense-bg, rgba(248,113,113,0.1));
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(239, 68, 68, 0.04));
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .m3-me-card--owed .m3-me-card__value {
@@ -364,14 +863,17 @@
 }
 
 .m3-me-card--get {
-  background: var(--m1-income-bg, rgba(52,211,153,0.1));
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.04));
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 .m3-me-card--get .m3-me-card__value {
   color: var(--m1-income, #34d399);
 }
 
-/* ── Mobile Responsive Rules for Member 3 Splitwise ────────── */
+/* ================================================================
+   Responsive Adaptations (/adapt)
+   ================================================================ */
 @media (max-width: 768px) {
   .m3-page {
     gap: 20px;
@@ -385,43 +887,72 @@
     align-items: flex-start;
     gap: 12px;
   }
-  .m3-me-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
+
   .m3-me-cards {
     grid-template-columns: 1fr;
     gap: 10px;
   }
+
   .m3-section {
     padding: 18px 16px;
     border-radius: 14px;
   }
+
+  .m3-settlements-grid,
+  .m3-balances-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
+  .member-row {
+    flex-direction: column;
+  }
+
+  .btn-add-member {
+    width: 100%;
+    text-align: center;
+  }
+
   .m3-group-card {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 12px;
   }
+
   .m3-group-card__right {
     width: 100%;
     justify-content: space-between;
     border-top: 1px dashed var(--m1-border);
     padding-top: 10px;
   }
+
   .m3-expense-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 10px;
   }
+
   .m3-expense-right {
     width: 100%;
     justify-content: space-between;
     border-top: 1px dashed var(--m1-border);
-    padding-top: 8px;
+    padding-top: 10px;
+  }
+
+  .m3-checkboxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
+/* Accessibility: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .m3-page,
+  .m3-group-card,
+  .m3-expense-item,
+  .member-tags li {
+    animation: none !important;
+    transition: none !important;
+  }
+}
