@@ -11,6 +11,8 @@ export default function GoalDetailsPage4() {
   const [goals, setGoals] = useLocalStorage4('m4-goals', [])
   const [goal, setGoal] = useState(null)
   const [depositAmount, setDepositAmount] = useState('')
+  const [depositNote, setDepositNote] = useState('')
+  const [simRate, setSimRate] = useState(500)
 
   useEffect(() => {
     const found = goals.find(g => g.id === parseInt(id))
@@ -43,9 +45,55 @@ export default function GoalDetailsPage4() {
 
   if (!goal) return <div className="goals-container" style={{paddingTop: '50px', textAlign: 'center'}}>Goal not found.</div>
 
-  const handleDeposit = (e) => {
-    e.preventDefault()
-    const amount = Number(depositAmount)
+  // FEATURE 2: Milestone Stepper progression checkpoints
+  const milestones = [
+    { label: '25% Seeded', amount: Math.round(goal.target * 0.25), achieved: percent >= 25 },
+    { label: '50% Halfway', amount: Math.round(goal.target * 0.50), achieved: percent >= 50 },
+    { label: '75% Stretch', amount: Math.round(goal.target * 0.75), achieved: percent >= 75 },
+    { label: '100% Achieved', amount: Number(goal.target), achieved: percent >= 100 }
+  ]
+
+  // FEATURE 3: Predictive Simulator Calculations
+  const monthsNeeded = simRate > 0 && remaining > 0 ? Math.ceil(remaining / simRate) : 0
+  const projectedDate = new Date()
+  projectedDate.setMonth(projectedDate.getMonth() + monthsNeeded)
+  const completionDateText = isCompleted ? 'Completed' : (monthsNeeded > 0 ? projectedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Now')
+  const dailyRate = Math.ceil(simRate / 30)
+  const weeklyRate = Math.ceil(simRate / 4)
+
+  let paceStatus = 'ontrack'
+  let paceMessage = '⚡ On track! At this pace you will meet your target smoothly.'
+  if (isCompleted) {
+    paceStatus = 'completed'
+    paceMessage = '🎉 Goal is already completed!'
+  } else if (goal.deadline) {
+    const deadlineDate = new Date(goal.deadline)
+    if (!isNaN(deadlineDate.getTime())) {
+      const diffMonths = (deadlineDate.getFullYear() - projectedDate.getFullYear()) * 12 + (deadlineDate.getMonth() - projectedDate.getMonth())
+      if (diffMonths > 0) {
+        paceStatus = 'ahead'
+        paceMessage = `🚀 Fantastic! At this pace you will hit your goal ${diffMonths} month${diffMonths > 1 ? 's' : ''} ahead of deadline!`
+      } else if (diffMonths < 0) {
+        paceStatus = 'behind'
+        paceMessage = `⚠️ At this pace you will finish ${Math.abs(diffMonths)} month${Math.abs(diffMonths) > 1 ? 's' : ''} after your deadline. Try saving a bit more per month.`
+      }
+    }
+  } else if (goal.timeframeValue) {
+    const origMonths = goal.timeframeUnit === 'years' ? Number(goal.timeframeValue) * 12 : Number(goal.timeframeValue)
+    const diffMonths = origMonths - monthsNeeded
+    if (diffMonths > 0) {
+      paceStatus = 'ahead'
+      paceMessage = `🚀 Fantastic! At this pace you will finish ${diffMonths} month${diffMonths > 1 ? 's' : ''} ahead of your timeline!`
+    } else if (diffMonths < 0) {
+      paceStatus = 'behind'
+      paceMessage = `⚠️ At this pace you will need ${Math.abs(diffMonths)} extra month${Math.abs(diffMonths) > 1 ? 's' : ''} beyond your timeline.`
+    }
+  }
+
+  const handleDeposit = (e, customAmt = null, customNote = null) => {
+    if (e) e.preventDefault()
+    const amount = Number(customAmt !== null ? customAmt : depositAmount)
+    const note = customNote || depositNote || 'Deposit'
     if (!amount || amount <= 0) return
 
     const updatedGoals = goals.map(g => {
@@ -54,7 +102,7 @@ export default function GoalDetailsPage4() {
           ...g,
           current: Number(g.current) + amount,
           history: [
-            { date: new Date().toLocaleDateString(), amount: amount },
+            { date: new Date().toLocaleDateString(), amount: amount, note: note },
             ...(g.history || [])
           ]
         }
@@ -63,7 +111,10 @@ export default function GoalDetailsPage4() {
     })
     
     setGoals(updatedGoals)
-    setDepositAmount('')
+    if (customAmt === null) {
+      setDepositAmount('')
+      setDepositNote('')
+    }
   }
 
   const handleDelete = () => {
@@ -133,6 +184,70 @@ export default function GoalDetailsPage4() {
             ></div>
           </div>
 
+          {/* FEATURE 2: Milestone Stepper (Progress Tiers) */}
+          <div className="milestones-stepper">
+            {milestones.map((m, idx) => (
+              <div key={idx} className={`milestone-step ${m.achieved ? 'active' : ''}`}>
+                <div className="milestone-badge">{m.achieved ? '✓' : idx + 1}</div>
+                <div className="milestone-label">{m.label}</div>
+                <div className="milestone-amt">{formatMoney(m.amount)}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* FEATURE 3: FiscalFlowAi Predictive What-If Simulator */}
+          {!isCompleted && remaining > 0 && (
+            <div className="simulator-card">
+              <div className="simulator-header">
+                <div>
+                  <h3>🧠 FiscalFlowAi Predictive "What-If" Simulator</h3>
+                  <p style={{color: '#8899bb', fontSize: '13px', marginTop: '4px'}}>
+                    Adjust monthly savings pace to forecast completion dates and timeline pacing.
+                  </p>
+                </div>
+                <span className="ai-tag">AI FORECAST</span>
+              </div>
+
+              <div className="simulator-slider-box">
+                <div className="slider-label-row">
+                  <span>What if I save each month:</span>
+                  <span className="slider-amt">{formatMoney(simRate)} / mo</span>
+                </div>
+                <input 
+                  type="range" 
+                  min="50" 
+                  max={Math.max(2500, Number(goal.target))} 
+                  step="50" 
+                  value={simRate} 
+                  onChange={e => setSimRate(Number(e.target.value))}
+                  className="sim-slider" 
+                />
+                <div style={{fontSize: '13px', color: '#8899bb', marginTop: '8px'}}>
+                  💡 Breaks down to approx <strong>{formatMoney(dailyRate)}/day</strong> (or <strong>{formatMoney(weeklyRate)}/week</strong>)
+                </div>
+              </div>
+
+              <div className="sim-stats-grid">
+                <div className="sim-stat">
+                  <div className="sim-stat-lbl">Projected Completion</div>
+                  <div className="sim-stat-val highlight">{completionDateText}</div>
+                </div>
+                <div className="sim-stat">
+                  <div className="sim-stat-lbl">Time Needed</div>
+                  <div className="sim-stat-val">{monthsNeeded} {monthsNeeded === 1 ? 'month' : 'months'}</div>
+                </div>
+                <div className="sim-stat">
+                  <div className="sim-stat-lbl">Daily Target</div>
+                  <div className="sim-stat-val">{formatMoney(dailyRate)} / day</div>
+                </div>
+              </div>
+
+              <div className={`sim-insight-banner ${paceStatus}`}>
+                {paceMessage}
+              </div>
+            </div>
+          )}
+
           {!isCompleted && monthsRemaining > 0 && (
             <div className="investment-section">
               <div className="investment-header">
@@ -181,15 +296,37 @@ export default function GoalDetailsPage4() {
         </div>
 
         <div className="goal-details-sidebar">
+          {/* FEATURE 2: Interactive Quick Deposit Box & Presets */}
           <div className="action-card">
-            <h3 style={{marginBottom: '16px'}}>Add Funds</h3>
-            <form className="add-funds-form" onSubmit={handleDeposit}>
+            <h3 style={{marginBottom: '10px'}}>Add Funds</h3>
+            <div className="deposit-preset-row">
+              {[100, 500, 1000].map(amt => (
+                <button
+                  key={amt}
+                  type="button"
+                  className="btn-preset"
+                  onClick={() => handleDeposit(null, amt, `Preset +$${amt}`)}
+                  disabled={isCompleted}
+                >
+                  +${amt}
+                </button>
+              ))}
+            </div>
+            <form className="add-funds-form" onSubmit={(e) => handleDeposit(e)}>
               <input 
                 type="number" 
                 className="add-funds-input" 
-                placeholder="Amount to deposit" 
+                placeholder="Custom amount ($)" 
                 value={depositAmount}
                 onChange={e => setDepositAmount(e.target.value)}
+                disabled={isCompleted}
+              />
+              <input 
+                type="text" 
+                className="add-funds-input" 
+                placeholder="Note (e.g. Freelance, Gift)" 
+                value={depositNote}
+                onChange={e => setDepositNote(e.target.value)}
                 disabled={isCompleted}
               />
               <button type="submit" className="btn-primary" disabled={isCompleted}>
@@ -198,15 +335,19 @@ export default function GoalDetailsPage4() {
             </form>
           </div>
 
+          {/* FEATURE 2: Deposit Log with Notes and Timestamps */}
           <div className="action-card">
-            <h3 style={{marginBottom: '16px'}}>Recent Deposits</h3>
+            <h3 style={{marginBottom: '16px'}}>Recent Deposits ({goal.history?.length || 0})</h3>
             {(!goal.history || goal.history.length === 0) ? (
               <div style={{color: '#8899bb', fontSize: '14px'}}>No deposit history yet.</div>
             ) : (
               <div className="history-list">
-                {goal.history.slice(0, 5).map((entry, idx) => (
+                {goal.history.slice(0, 6).map((entry, idx) => (
                   <div key={idx} className="history-item">
-                    <span className="history-date">{entry.date}</span>
+                    <div>
+                      <div className="history-note">{entry.note || 'Deposit'}</div>
+                      <span className="history-date">{entry.date}</span>
+                    </div>
                     <span className="history-amount">+{formatMoney(entry.amount)}</span>
                   </div>
                 ))}

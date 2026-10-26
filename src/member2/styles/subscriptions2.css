@@ -1049,7 +1049,309 @@
   border: 1px solid var(--m1-border);
 }
 
+/* ==========================================================================
+   Smart Subscription Insights Section & Cards
+   ========================================================================== */
+
+.m2-insights-section {
+  background: var(--m1-bg-card);
+  border: 1px solid var(--m1-border);
+  border-radius: var(--m1-radius-lg, 16px);
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--m1-shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.m2-insights-section:hover {
+  border-color: var(--m1-border-strong);
+}
+
+.m2-insights-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.m2-insights-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.m2-insights-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.m2-insights-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.01em;
+}
+
+.m2-insights-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.m2-insights-subtitle {
+  font-size: 13.5px;
+  color: var(--m1-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.m2-btn-analyze {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--m1-radius-md, 12px);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.m2-btn-analyze:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(124, 58, 237, 0.45);
+}
+
+.m2-btn-analyze:active {
+  transform: translateY(0);
+}
+
+.m2-btn-analyze--active {
+  background: linear-gradient(135deg, #3730a3 0%, #5b21b6 100%);
+  border-color: rgba(167, 139, 250, 0.4);
+}
+
+.m2-btn-analyze__icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+/* 6-Card Highlights Grid */
+.m2-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.m2-insight-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--m1-radius-md, 12px);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.m2-insight-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(167, 139, 250, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.m2-insight-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.m2-insight-card__label {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--m1-text-secondary);
+}
+
+.m2-insight-card__icon {
+  font-size: 17px;
+  opacity: 0.85;
+}
+
+.m2-insight-card__value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--m1-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.m2-insight-card__value--highlight {
+  color: var(--m1-accent-light, #a78bfa);
+}
+
+.m2-insight-card__value--accent {
+  color: #38bdf8;
+}
+
+.m2-insight-card__value--truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.m2-insight-card__sub {
+  font-size: 12px;
+  color: var(--m1-text-muted);
+  line-height: 1.35;
+}
+
+/* Compact Insights Panel */
+.m2-insights-panel {
+  background: linear-gradient(145deg, rgba(124, 58, 237, 0.07) 0%, rgba(15, 17, 32, 0.95) 100%);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  border-radius: var(--m1-radius-md, 14px);
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  animation: m2FadeIn 0.25s ease-out;
+}
+
+.m2-insights-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.m2-insights-panel__title-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.m2-insights-panel__badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.m2-insights-panel__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.m2-insights-panel__meta {
+  font-size: 12px;
+  color: var(--m1-text-secondary);
+  font-weight: 500;
+}
+
+.m2-insights-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.m2-insight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.m2-insight-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(167, 139, 250, 0.2);
+}
+
+.m2-insight-item__icon {
+  font-size: 20px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.m2-insight-item__text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.m2-insight-item__title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--m1-text-primary);
+}
+
+.m2-insight-item__desc {
+  font-size: 13px;
+  color: var(--m1-text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.m2-insights-empty {
+  font-size: 13.5px;
+  color: var(--m1-text-secondary);
+  margin: 0;
+  text-align: center;
+  padding: 16px;
+}
+
+@media (max-width: 992px) {
+  .m2-insights-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
+  .m2-insights-section {
+    padding: 18px;
+  }
+
+  .m2-insights-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .m2-btn-analyze {
+    width: 100%;
+  }
+
+  .m2-insights-grid {
+    grid-template-columns: 1fr;
+  }
   .m2-stats-grid {
     grid-template-columns: 1fr;
   }
