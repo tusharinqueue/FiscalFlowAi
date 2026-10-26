@@ -11,6 +11,7 @@ export default function GoalDetailsPage4() {
   const [goals, setGoals] = useLocalStorage4('m4-goals', [])
   const [goal, setGoal] = useState(null)
   const [depositAmount, setDepositAmount] = useState('')
+  const [depositNote, setDepositNote] = useState('')
 
   useEffect(() => {
     const found = goals.find(g => g.id === parseInt(id))
@@ -43,9 +44,17 @@ export default function GoalDetailsPage4() {
 
   if (!goal) return <div className="goals-container" style={{paddingTop: '50px', textAlign: 'center'}}>Goal not found.</div>
 
-  const handleDeposit = (e) => {
-    e.preventDefault()
-    const amount = Number(depositAmount)
+  const milestones = [
+    { label: '25% Seeded', amount: Math.round(goal.target * 0.25), achieved: percent >= 25 },
+    { label: '50% Halfway', amount: Math.round(goal.target * 0.50), achieved: percent >= 50 },
+    { label: '75% Stretch', amount: Math.round(goal.target * 0.75), achieved: percent >= 75 },
+    { label: '100% Achieved', amount: Number(goal.target), achieved: percent >= 100 }
+  ]
+
+  const handleDeposit = (e, customAmt = null, customNote = null) => {
+    if (e) e.preventDefault()
+    const amount = Number(customAmt !== null ? customAmt : depositAmount)
+    const note = customNote || depositNote || 'Deposit'
     if (!amount || amount <= 0) return
 
     const updatedGoals = goals.map(g => {
@@ -54,7 +63,7 @@ export default function GoalDetailsPage4() {
           ...g,
           current: Number(g.current) + amount,
           history: [
-            { date: new Date().toLocaleDateString(), amount: amount },
+            { date: new Date().toLocaleDateString(), amount: amount, note: note },
             ...(g.history || [])
           ]
         }
@@ -63,7 +72,10 @@ export default function GoalDetailsPage4() {
     })
     
     setGoals(updatedGoals)
-    setDepositAmount('')
+    if (customAmt === null) {
+      setDepositAmount('')
+      setDepositNote('')
+    }
   }
 
   const handleDelete = () => {
@@ -133,6 +145,17 @@ export default function GoalDetailsPage4() {
             ></div>
           </div>
 
+          {/* FEATURE 2: Milestone Stepper (Progress Tiers) */}
+          <div className="milestones-stepper">
+            {milestones.map((m, idx) => (
+              <div key={idx} className={`milestone-step ${m.achieved ? 'active' : ''}`}>
+                <div className="milestone-badge">{m.achieved ? '✓' : idx + 1}</div>
+                <div className="milestone-label">{m.label}</div>
+                <div className="milestone-amt">{formatMoney(m.amount)}</div>
+              </div>
+            ))}
+          </div>
+
           {!isCompleted && monthsRemaining > 0 && (
             <div className="investment-section">
               <div className="investment-header">
@@ -181,15 +204,37 @@ export default function GoalDetailsPage4() {
         </div>
 
         <div className="goal-details-sidebar">
+          {/* FEATURE 2: Interactive Quick Deposit Box & Presets */}
           <div className="action-card">
-            <h3 style={{marginBottom: '16px'}}>Add Funds</h3>
-            <form className="add-funds-form" onSubmit={handleDeposit}>
+            <h3 style={{marginBottom: '10px'}}>Add Funds</h3>
+            <div className="deposit-preset-row">
+              {[100, 500, 1000].map(amt => (
+                <button
+                  key={amt}
+                  type="button"
+                  className="btn-preset"
+                  onClick={() => handleDeposit(null, amt, `Preset +$${amt}`)}
+                  disabled={isCompleted}
+                >
+                  +${amt}
+                </button>
+              ))}
+            </div>
+            <form className="add-funds-form" onSubmit={(e) => handleDeposit(e)}>
               <input 
                 type="number" 
                 className="add-funds-input" 
-                placeholder="Amount to deposit" 
+                placeholder="Custom amount ($)" 
                 value={depositAmount}
                 onChange={e => setDepositAmount(e.target.value)}
+                disabled={isCompleted}
+              />
+              <input 
+                type="text" 
+                className="add-funds-input" 
+                placeholder="Note (e.g. Freelance, Gift)" 
+                value={depositNote}
+                onChange={e => setDepositNote(e.target.value)}
                 disabled={isCompleted}
               />
               <button type="submit" className="btn-primary" disabled={isCompleted}>
@@ -198,15 +243,19 @@ export default function GoalDetailsPage4() {
             </form>
           </div>
 
+          {/* FEATURE 2: Deposit Log with Notes and Timestamps */}
           <div className="action-card">
-            <h3 style={{marginBottom: '16px'}}>Recent Deposits</h3>
+            <h3 style={{marginBottom: '16px'}}>Recent Deposits ({goal.history?.length || 0})</h3>
             {(!goal.history || goal.history.length === 0) ? (
               <div style={{color: '#8899bb', fontSize: '14px'}}>No deposit history yet.</div>
             ) : (
               <div className="history-list">
-                {goal.history.slice(0, 5).map((entry, idx) => (
+                {goal.history.slice(0, 6).map((entry, idx) => (
                   <div key={idx} className="history-item">
-                    <span className="history-date">{entry.date}</span>
+                    <div>
+                      <div className="history-note">{entry.note || 'Deposit'}</div>
+                      <span className="history-date">{entry.date}</span>
+                    </div>
                     <span className="history-amount">+{formatMoney(entry.amount)}</span>
                   </div>
                 ))}

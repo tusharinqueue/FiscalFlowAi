@@ -499,3 +499,95 @@
   opacity: 1;
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* Milestone Stepper */
+.milestones-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #2a3555;
+}
+.milestone-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 6px;
+  background: #101322;
+  border: 1px solid #2a3555;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+.milestone-step.active {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: #34d399;
+}
+.milestone-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2a3555;
+  color: #8899bb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.milestone-step.active .milestone-badge {
+  background: #34d399;
+  color: #0b1329;
+}
+.milestone-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8899bb;
+  margin-bottom: 2px;
+}
+.milestone-step.active .milestone-label {
+  color: #f0f0f0;
+}
+.milestone-amt {
+  font-size: 11px;
+  color: #8899bb;
+}
+.milestone-step.active .milestone-amt {
+  color: #34d399;
+  font-weight: 600;
+}
+
+/* Preset Deposit Buttons */
+.deposit-preset-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.btn-preset {
+  flex: 1;
+  background: #101322;
+  border: 1px solid #2a3555;
+  color: #34d399;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+.btn-preset:hover:not(:disabled) {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: #34d399;
+}
+.btn-preset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.history-note {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f0f0f0;
+  margin-bottom: 2px;
+}
