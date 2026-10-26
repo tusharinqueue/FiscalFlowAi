@@ -2,8 +2,17 @@
 // All logic is in this one file: Add, Edit, Delete, localStorage, validation, Export
 
 import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import {
+  addTransaction,
+  editTransaction,
+  deleteTransaction,
+  setTransactions,
+  loadTransactionsFromStorage,
+  STORAGE_KEY,
+} from '../../redux/transactionsSlice'
 import '../styles/theme1.css'
 import '../styles/txnpage1.css'
 
@@ -16,8 +25,8 @@ const SORT_OPTIONS = [
 ]
 
 // Constants  
-// The key we use to save/load transactions from localStorage
-const STORAGE_KEY = 'm1-transactions'
+// The key we use to save/load transactions from localStorage is imported from transactionsSlice
+
 
 // List of categories the user can choose from
 const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Salary', 'Other']
@@ -57,8 +66,9 @@ export default function Transactions1() {
 
   //  State   
 
-  // transactions: the main list of all transactions
-  const [transactions, setTransactions] = useState([])
+  // Redux hooks: dispatch for sending actions, useSelector for accessing Redux state
+  const dispatch = useDispatch()
+  const transactions = useSelector((state) => state.transactions.items)
 
   // showModal: true = the Add/Edit form is visible, false = it is hidden
   const [showModal, setShowModal] = useState(false)
@@ -95,23 +105,19 @@ export default function Transactions1() {
   const [exportSuccess, setExportSuccess] = useState('')
 
 
-  //   Load from localStorage on first render   
-  // useEffect with [] runs only ONCE when the component first appears on screen.
-  // We check if any transactions were saved previously and load them into state.
+  // Synchronize Redux state with localStorage when the component mounts
+  // (In case other pages like Subscriptions added or modified transactions in localStorage)
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      setTransactions(JSON.parse(saved))
-    }
-  }, []) // empty [] = run only on first render
+    const saved = loadTransactionsFromStorage()
+    dispatch(setTransactions(saved))
+  }, [dispatch])
 
-
-  //   Save to localStorage whenever transactions changes  
-  // useEffect with [transactions] runs every time the transactions array changes.
-  // This keeps localStorage always up to date with the latest state.
+  // Redux store.subscribe in store.js automatically persists all changes to localStorage.
+  // This effect serves as an additional synchronization guarantee with localStorage.
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions))
-  }, [transactions]) // runs whenever transactions changes
+  }, [transactions])
+
 
 
   //   Close the detail drawer when Escape is pressed  
@@ -239,40 +245,32 @@ export default function Transactions1() {
     }
 
     if (editingId) {
-      //   EDIT MODE: replace the old transaction with updated values  
-      // map() goes through every transaction. When we find the one with
-      // the matching id, we replace it. All others stay the same.
-      const updatedList = transactions.map(txn => {
-        if (txn.id === editingId) {
-          // Return an updated version of this transaction
-          return {
-            ...txn,                           // keep id
-            title: form.title.trim(),
-            amount: parseFloat(form.amount),  // convert string to number
-            type: form.type,
-            category: form.category,
-            date: form.date,
-            description: form.description.trim()
-          }
-        }
-        return txn // leave all other transactions unchanged
-      })
-      setTransactions(updatedList)
-
+      // EDIT MODE: dispatch editTransaction action to Redux store
+      dispatch(
+        editTransaction({
+          id: editingId,
+          title: form.title.trim(),
+          amount: parseFloat(form.amount),
+          type: form.type,
+          category: form.category,
+          date: form.date,
+          description: form.description.trim(),
+        })
+      )
     } else {
-      //   ADD MODE: create a brand new transaction object  
+      // ADD MODE: create new transaction and dispatch addTransaction action to Redux store
       const newTransaction = {
-        id: Date.now().toString(),          // simple unique id using timestamp
+        id: Date.now().toString(),
         title: form.title.trim(),
-        amount: parseFloat(form.amount),    // convert string "450" to number 450
+        amount: parseFloat(form.amount),
         type: form.type,
         category: form.category,
         date: form.date,
-        description: form.description.trim()
+        description: form.description.trim(),
       }
-      // Add the new transaction to the FRONT of the list (newest first)
-      setTransactions([newTransaction, ...transactions])
+      dispatch(addTransaction(newTransaction))
     }
+
 
     closeModal() // close and reset the form
   }
@@ -284,9 +282,10 @@ export default function Transactions1() {
   const [itemToDelete, setItemToDelete] = useState(null)
 
   function confirmDelete(id) {
-    setTransactions(transactions.filter(txn => txn.id !== id))
+    dispatch(deleteTransaction(id))
     setItemToDelete(null)
   }
+
 
 
   //    Helper: format a number as Indian Rupees  
