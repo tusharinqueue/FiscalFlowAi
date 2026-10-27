@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { ThemeProvider } from './member3/context/ThemeContext'
+
 
 // Member 1 imports
 import Member1Layout from './member1/components/Member1Layout'
@@ -19,7 +21,9 @@ import GoalDetailsPage4 from './member4/pages/GoalDetailsPage4'
 
 function App() {
   return (
-    <BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+
       <Routes>
         <Route path="/login" element={<LoginPage1 />} />
 
@@ -55,6 +59,7 @@ function App() {
         />
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   )
 }
 

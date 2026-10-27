@@ -474,7 +474,7 @@
 }
 
 .m3-form select option {
-  background: #0f1120;
+  background: var(--m1-bg-surface, #0f1120);
   color: var(--m1-text-primary);
 }
 
@@ -956,3 +956,62 @@
     transition: none !important;
   }
 }
+
+/* ============================================================================
+   LIGHT MODE HIGH-CONTRAST REFINEMENTS (/colorize & /bolder)
+   ============================================================================ */
+[data-theme="light"] .m3-section {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .m3-group-card {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .m3-group-card:hover {
+  border-color: var(--m1-accent, #6366f1);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.12);
+}
+
+[data-theme="light"] .m3-form input,
+[data-theme="light"] .m3-form select {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .m3-form input:focus,
+[data-theme="light"] .m3-form select:focus {
+  background: #ffffff;
+  border-color: var(--m1-accent, #6366f1);
+}
+
+[data-theme="light"] .m3-balance-card,
+[data-theme="light"] .m3-expense-item {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.07);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+[data-theme="light"] .m3-chip-btn {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+[data-theme="light"] .m3-chip-btn:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: #6366f1;
+  color: #4f46e5;
+}
+
+[data-theme="light"] .m3-onboarding-hint {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+

@@ -1,21 +1,12 @@
-// ThemeToggle1.jsx – Sun / Moon toggle button
-import '../styles/theme1.css'
+// ============================================================================
+// ThemeToggle1.jsx – Adapter Forwarding to Member 3's ThemeToggle
+// ============================================================================
+// The Theme Toggle component is authored and maintained in Member 3:
+// src/member3/components/ThemeToggle.jsx
+// ============================================================================
 
-export default function ThemeToggle1({ theme, onToggle }) {
-  const isDark = theme === 'dark'
-  return (
-    <button
-      id="m1-theme-toggle"
-      className="m1-theme-toggle"
-      onClick={onToggle}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      title={isDark ? 'Light mode' : 'Dark mode'}
-    >
-      <span className="m1-theme-toggle__track">
-        <span className="m1-theme-toggle__icon m1-theme-toggle__icon--sun">☀️</span>
-        <span className="m1-theme-toggle__icon m1-theme-toggle__icon--moon">🌙</span>
-        <span className={`m1-theme-toggle__thumb ${isDark ? 'm1-theme-toggle__thumb--dark' : 'm1-theme-toggle__thumb--light'}`} />
-      </span>
-    </button>
-  )
-}
+import ThemeToggle from '../../member3/components/ThemeToggle'
+
+export default ThemeToggle
+
+
