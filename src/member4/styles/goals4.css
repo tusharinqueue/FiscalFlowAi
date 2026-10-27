@@ -429,7 +429,6 @@
   flex: 1;
 }
 
-/* Smart Deadline & Risk Alerts Engine */
 .alerts-container {
   display: flex;
   flex-direction: column;
@@ -500,7 +499,6 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Milestone Stepper */
 .milestones-stepper {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -559,7 +557,6 @@
   font-weight: 600;
 }
 
-/* Preset Deposit Buttons */
 .deposit-preset-row {
   display: flex;
   gap: 8px;
@@ -592,7 +589,6 @@
   margin-bottom: 2px;
 }
 
-/* What-If Simulator */
 .simulator-card {
   background: #1a1a2e;
   border: 1px solid #2a3555;
@@ -693,10 +689,6 @@
   color: #a5b4fc;
 }
 
-
-/* ==========================================================================
-   MEMBER 4: REUSABLE FORM COMPONENTS & VALIDATION STYLES
-   ========================================================================== */
 .m4-form-group {
   margin-bottom: 18px;
   text-align: left;
@@ -786,9 +778,6 @@
   color: #8899bb;
 }
 
-/* ==========================================================================
-   MEMBER 4: REUSABLE BUTTON COMPONENT STYLES
-   ========================================================================== */
 .m4-btn {
   display: inline-flex;
   align-items: center;
@@ -889,9 +878,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* ==========================================================================
-   MEMBER 4: ASYNC API ERROR & RETRY BANNER
-   ========================================================================== */
 .api-error-card {
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.3);
@@ -955,9 +941,6 @@
   color: #f87171;
 }
 
-/* ==========================================================================
-   MEMBER 4: ZUSTAND ALERTS FILTER BAR
-   ========================================================================== */
 .alert-filters-bar {
   display: flex;
   justify-content: space-between;
