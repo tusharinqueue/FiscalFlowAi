@@ -1,25 +1,33 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useLocalStorage4 } from '../hooks/useLocalStorage4'
+import { useGoals4, withGoalsProvider } from '../context/GoalsContext4'
 import { useInvestment4 } from '../hooks/useInvestment4'
 import { useAlerts4 } from '../hooks/useAlerts4'
+import { validateDepositForm } from '../utils/goalValidation4'
+import InputField4 from '../components/InputField4'
+import Button4 from '../components/Button4'
 import '../styles/goals4.css'
 
-export default function GoalDetailsPage4() {
+function GoalDetailsPage4Base() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [goals, setGoals] = useLocalStorage4('m4-goals', [])
+
+  // CONTEXT API: Consume global goals state
+  const { goals, depositToGoal, deleteGoal, getGoalById } = useGoals4()
+
   const [goal, setGoal] = useState(null)
   const [depositAmount, setDepositAmount] = useState('')
   const [depositNote, setDepositNote] = useState('')
+  const [depositErrors, setDepositErrors] = useState({})
+  const [depositTouched, setDepositTouched] = useState({})
   const [simRate, setSimRate] = useState(500)
 
   useEffect(() => {
-    const found = goals.find(g => g.id === parseInt(id))
+    const found = getGoalById(id)
     if (found) {
       setGoal(found)
     }
-  }, [id, goals])
+  }, [id, goals, getGoalById])
 
   const formatMoney = (amt) => '$' + Number(amt).toLocaleString()
 
@@ -39,13 +47,26 @@ export default function GoalDetailsPage4() {
   }
 
   const monthsRemaining = getMonthsRemaining(goal)
-  const { invData, loadingApi, calculateRequiredMonthly, calculateTotalReturn } = useInvestment4(goal, monthsRemaining, isCompleted)
+
+  // ASYNC STATE MANAGEMENT: Investment hook with loading, error, and retry
+  const {
+    invData,
+    loadingApi,
+    errorApi,
+    retry,
+    simulateFailure,
+    toggleSimulateFailure,
+    calculateRequiredMonthly,
+    calculateTotalReturn
+  } = useInvestment4(goal, monthsRemaining, isCompleted)
+
+  // ZUSTAND: Alerts from store
   const { alerts } = useAlerts4(goal ? [goal] : [])
   const goalAlert = alerts[0]
 
   if (!goal) return <div className="goals-container" style={{paddingTop: '50px', textAlign: 'center'}}>Goal not found.</div>
 
-  // FEATURE 2: Milestone Stepper progression checkpoints
+  // Milestone Stepper progression checkpoints
   const milestones = [
     { label: '25% Seeded', amount: Math.round(goal.target * 0.25), achieved: percent >= 25 },
     { label: '50% Halfway', amount: Math.round(goal.target * 0.50), achieved: percent >= 50 },
@@ -53,7 +74,7 @@ export default function GoalDetailsPage4() {
     { label: '100% Achieved', amount: Number(goal.target), achieved: percent >= 100 }
   ]
 
-  // FEATURE 3: Predictive Simulator Calculations
+  // Predictive Simulator Calculations
   const monthsNeeded = simRate > 0 && remaining > 0 ? Math.ceil(remaining / simRate) : 0
   const projectedDate = new Date()
   projectedDate.setMonth(projectedDate.getMonth() + monthsNeeded)
@@ -90,42 +111,40 @@ export default function GoalDetailsPage4() {
     }
   }
 
+  // FORM VALIDATION: Deposit form with reusable components
   const handleDeposit = (e, customAmt = null, customNote = null) => {
     if (e) e.preventDefault()
-    const amount = Number(customAmt !== null ? customAmt : depositAmount)
+    const amount = customAmt !== null ? customAmt : depositAmount
     const note = customNote || depositNote || 'Deposit'
-    if (!amount || amount <= 0) return
 
-    const updatedGoals = goals.map(g => {
-      if (g.id === goal.id) {
-        return {
-          ...g,
-          current: Number(g.current) + amount,
-          history: [
-            { date: new Date().toLocaleDateString(), amount: amount, note: note },
-            ...(g.history || [])
-          ]
-        }
-      }
-      return g
-    })
-    
-    setGoals(updatedGoals)
+    if (customAmt === null) {
+      // Validate using validation utility
+      setDepositTouched({ amount: true, note: true })
+      const { errors, isValid } = validateDepositForm(amount, note, remaining)
+      setDepositErrors(errors)
+      if (!isValid) return
+    }
+
+    // CONTEXT API: Dispatch deposit action to global state
+    depositToGoal(goal.id, Number(amount), note)
+
     if (customAmt === null) {
       setDepositAmount('')
       setDepositNote('')
+      setDepositTouched({})
+      setDepositErrors({})
     }
   }
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this goal?')) {
-      const updatedGoals = goals.filter(g => g.id !== goal.id)
-      setGoals(updatedGoals)
+      // CONTEXT API: Dispatch delete action
+      deleteGoal(goal.id)
       navigate('/goals')
     }
   }
 
-  let timeDisplay = goal.timeframeValue 
+  let timeDisplay = goal.timeframeValue
     ? `In ${goal.timeframeValue} ${goal.timeframeUnit}`
     : (goal.deadline ? goal.deadline : 'No timeframe')
 
@@ -134,7 +153,7 @@ export default function GoalDetailsPage4() {
       <Link to="/goals" className="back-link">
         <span>←</span> Back to Goals
       </Link>
-      
+
       <div className="goal-details-layout">
         <div className="goal-details-main">
           {goalAlert && (
@@ -178,13 +197,13 @@ export default function GoalDetailsPage4() {
             <span style={{fontWeight: '600'}}>{percent.toFixed(1)}%</span>
           </div>
           <div className="goal-progress-bar-bg" style={{ height: '16px', borderRadius: '8px' }}>
-            <div 
-              className="goal-progress-bar-fill" 
+            <div
+              className="goal-progress-bar-fill"
               style={{ width: `${percent}%`, background: isCompleted ? '#3b82f6' : '#34d399' }}
             ></div>
           </div>
 
-          {/* FEATURE 2: Milestone Stepper (Progress Tiers) */}
+          {/* Milestone Stepper (Progress Tiers) */}
           <div className="milestones-stepper">
             {milestones.map((m, idx) => (
               <div key={idx} className={`milestone-step ${m.achieved ? 'active' : ''}`}>
@@ -195,7 +214,7 @@ export default function GoalDetailsPage4() {
             ))}
           </div>
 
-          {/* FEATURE 3: FiscalFlowAi Predictive What-If Simulator */}
+          {/* Predictive What-If Simulator */}
           {!isCompleted && remaining > 0 && (
             <div className="simulator-card">
               <div className="simulator-header">
@@ -213,14 +232,14 @@ export default function GoalDetailsPage4() {
                   <span>What if I save each month:</span>
                   <span className="slider-amt">{formatMoney(simRate)} / mo</span>
                 </div>
-                <input 
-                  type="range" 
-                  min="50" 
-                  max={Math.max(2500, Number(goal.target))} 
-                  step="50" 
-                  value={simRate} 
+                <input
+                  type="range"
+                  min="50"
+                  max={Math.max(2500, Number(goal.target))}
+                  step="50"
+                  value={simRate}
                   onChange={e => setSimRate(Number(e.target.value))}
-                  className="sim-slider" 
+                  className="sim-slider"
                 />
                 <div style={{fontSize: '13px', color: '#8899bb', marginTop: '8px'}}>
                   💡 Breaks down to approx <strong>{formatMoney(dailyRate)}/day</strong> (or <strong>{formatMoney(weeklyRate)}/week</strong>)
@@ -248,18 +267,53 @@ export default function GoalDetailsPage4() {
             </div>
           )}
 
+          {/* ASYNC STATE MANAGEMENT: Investment Recommendations with Error & Retry */}
           {!isCompleted && monthsRemaining > 0 && (
             <div className="investment-section">
               <div className="investment-header">
                 <h3>Smart Investment Recommendations</h3>
-                {loadingApi && (
-                  <div className="api-loader">
-                    <div className="spinner"></div> Fetching live market data...
-                  </div>
-                )}
+                <div className="api-header-actions">
+                  {/* Demo toggle for simulating API failure during viva */}
+                  <button
+                    type="button"
+                    className={`demo-toggle-btn ${simulateFailure ? 'active' : ''}`}
+                    onClick={toggleSimulateFailure}
+                    title="Toggle simulated API failure for demonstration"
+                  >
+                    {simulateFailure ? '🔴 Failure Mode ON' : '🟢 Normal Mode'}
+                  </button>
+
+                  {loadingApi && (
+                    <div className="api-loader">
+                      <div className="spinner"></div> Fetching live market data...
+                    </div>
+                  )}
+                </div>
               </div>
-              
-              {!loadingApi && invData && (
+
+              {/* ERROR STATE with Retry UI */}
+              {errorApi && (
+                <div className="api-error-card">
+                  <div className="api-error-content">
+                    <span className="api-error-icon">🚨</span>
+                    <div>
+                      <div className="api-error-title">Failed to Fetch Market Data</div>
+                      <div className="api-error-msg">{errorApi}</div>
+                    </div>
+                  </div>
+                  <Button4
+                    variant="outline"
+                    onClick={retry}
+                    isLoading={loadingApi}
+                    icon="🔄"
+                  >
+                    Retry
+                  </Button4>
+                </div>
+              )}
+
+              {/* SUCCESS STATE */}
+              {!loadingApi && !errorApi && invData && (
                 <>
                   <p style={{color: '#8899bb', fontSize: '14px', marginBottom: '20px'}}>
                     Based on market APIs, here is what you need to invest monthly to reach your remaining {formatMoney(remaining)} in {monthsRemaining} months.
@@ -268,7 +322,7 @@ export default function GoalDetailsPage4() {
                     {invData.map((inv, idx) => {
                       const monthlyPmt = calculateRequiredMonthly(inv.rate)
                       const totalReturns = calculateTotalReturn(monthlyPmt)
-                      
+
                       return (
                         <div key={idx} className="inv-card">
                           <div className={`inv-badge ${inv.type}`}>
@@ -276,7 +330,7 @@ export default function GoalDetailsPage4() {
                           </div>
                           <div className="inv-card-title">{inv.name}</div>
                           <div className="inv-rate">{inv.displayRate} <span style={{fontSize: '14px', color: '#8899bb', fontWeight: '400'}}>p.a.</span></div>
-                          
+
                           <div className="inv-detail">
                             <span>Monthly SIP:</span>
                             <span>{formatMoney(monthlyPmt.toFixed(0))}</span>
@@ -296,46 +350,51 @@ export default function GoalDetailsPage4() {
         </div>
 
         <div className="goal-details-sidebar">
-          {/* FEATURE 2: Interactive Quick Deposit Box & Presets */}
+          {/* Add Funds with Reusable Components & Deposit Validation */}
           <div className="action-card">
             <h3 style={{marginBottom: '10px'}}>Add Funds</h3>
             <div className="deposit-preset-row">
               {[100, 500, 1000].map(amt => (
-                <button
+                <Button4
                   key={amt}
-                  type="button"
-                  className="btn-preset"
+                  variant="preset"
                   onClick={() => handleDeposit(null, amt, `Preset +$${amt}`)}
                   disabled={isCompleted}
                 >
                   +${amt}
-                </button>
+                </Button4>
               ))}
             </div>
             <form className="add-funds-form" onSubmit={(e) => handleDeposit(e)}>
-              <input 
-                type="number" 
-                className="add-funds-input" 
-                placeholder="Custom amount ($)" 
+              <InputField4
+                name="depositAmount"
+                type="number"
+                placeholder="Custom amount ($)"
+                prefix="$"
                 value={depositAmount}
                 onChange={e => setDepositAmount(e.target.value)}
+                onBlur={() => setDepositTouched(prev => ({ ...prev, amount: true }))}
+                error={depositErrors.amount}
+                touched={depositTouched.amount}
                 disabled={isCompleted}
               />
-              <input 
-                type="text" 
-                className="add-funds-input" 
-                placeholder="Note (e.g. Freelance, Gift)" 
+              <InputField4
+                name="depositNote"
+                placeholder="Note (e.g. Freelance, Gift)"
                 value={depositNote}
                 onChange={e => setDepositNote(e.target.value)}
+                onBlur={() => setDepositTouched(prev => ({ ...prev, note: true }))}
+                error={depositErrors.note}
+                touched={depositTouched.note}
                 disabled={isCompleted}
               />
-              <button type="submit" className="btn-primary" disabled={isCompleted}>
+              <Button4 variant="primary" type="submit" disabled={isCompleted}>
                 Deposit
-              </button>
+              </Button4>
             </form>
           </div>
 
-          {/* FEATURE 2: Deposit Log with Notes and Timestamps */}
+          {/* Deposit Log */}
           <div className="action-card">
             <h3 style={{marginBottom: '16px'}}>Recent Deposits ({goal.history?.length || 0})</h3>
             {(!goal.history || goal.history.length === 0) ? (
@@ -356,10 +415,13 @@ export default function GoalDetailsPage4() {
           </div>
 
           <div style={{marginTop: 'auto', textAlign: 'right'}}>
-            <button className="btn-danger" onClick={handleDelete}>Delete Goal</button>
+            <Button4 variant="danger" onClick={handleDelete}>Delete Goal</Button4>
           </div>
         </div>
       </div>
     </div>
   )
 }
+
+// Wrap with React Context Provider
+export default withGoalsProvider(GoalDetailsPage4Base)

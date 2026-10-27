@@ -1,82 +1,33 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
+import { useAlertsStore4 } from '../store/useAlertsStore4'
 
+/**
+ * Custom hook adapting Zustand store for Member 4 alerts
+ * Demonstrates consuming Zustand store actions and state within React components.
+ */
 export function useAlerts4(goals = []) {
-  const [dismissed, setDismissed] = useState([])
+  const dismissedIds = useAlertsStore4((state) => state.dismissedIds)
+  const isBannerOpen = useAlertsStore4((state) => state.isBannerOpen)
+  const riskFilter = useAlertsStore4((state) => state.riskFilter)
+  const dismissAlert = useAlertsStore4((state) => state.dismissAlert)
+  const resetDismissed = useAlertsStore4((state) => state.resetDismissed)
+  const setRiskFilter = useAlertsStore4((state) => state.setRiskFilter)
+  const getFilteredAlerts = useAlertsStore4((state) => state.getFilteredAlerts)
 
-  const alerts = useMemo(() => {
-    const list = []
-    const now = new Date()
+  // dismissedIds and riskFilter are read inside getFilteredAlerts via Zustand get(),
+  // but we list them so React re-renders when they change in the store.
+  const activeAlerts = useMemo(() => {
+    return getFilteredAlerts(goals)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goals, dismissedIds, riskFilter, getFilteredAlerts])
 
-    goals.forEach(goal => {
-      const current = Number(goal.current) || 0
-      const target = Number(goal.target) || 0
-      const percent = target > 0 ? (current / target) * 100 : 0
-      const remaining = Math.max(target - current, 0)
-      const formatMoney = (n) => '$' + Number(n).toLocaleString()
-
-      // 1. Celebration Alert (Goal completed)
-      if (percent >= 100) {
-        list.push({
-          id: `cel-${goal.id}`,
-          goalId: goal.id,
-          type: 'celebration',
-          icon: '🎉',
-          title: 'Goal Achieved!',
-          message: `Congratulations! You reached 100% of your target for "${goal.title}".`
-        })
-        return
-      }
-
-      // Check deadline from deadline date
-      let daysRemaining = null
-      if (goal.deadline) {
-        const d = new Date(goal.deadline)
-        if (!isNaN(d.getTime())) {
-          daysRemaining = Math.ceil((d - now) / (1000 * 60 * 60 * 24))
-        }
-      }
-
-      // 2. Overdue Alert
-      if (daysRemaining !== null && daysRemaining < 0) {
-        list.push({
-          id: `over-${goal.id}`,
-          goalId: goal.id,
-          type: 'overdue',
-          icon: '🚨',
-          title: 'Goal Overdue',
-          message: `"${goal.title}" passed its deadline (${goal.deadline}) and still needs ${formatMoney(remaining)}.`
-        })
-      } 
-      // 3. Urgent Alert: <= 7 days remaining with < 80% saved
-      else if (daysRemaining !== null && daysRemaining <= 7 && percent < 80) {
-        const timeText = daysRemaining <= 0 ? 'today' : `${daysRemaining} day${daysRemaining > 1 ? 's' : ''}`
-        list.push({
-          id: `urg-${goal.id}`,
-          goalId: goal.id,
-          type: 'urgent',
-          icon: '⚠️',
-          title: 'Urgent Deadline',
-          message: `"${goal.title}" is due in ${timeText} and still needs ${formatMoney(remaining)}!`
-        })
-      }
-      // 4. Urgent timeframe fallback (under a month left with < 80% saved)
-      else if (!goal.deadline && goal.timeframeUnit === 'months' && Number(goal.timeframeValue) <= 1 && percent < 80) {
-        list.push({
-          id: `urg-${goal.id}`,
-          goalId: goal.id,
-          type: 'urgent',
-          icon: '⚠️',
-          title: 'Urgent Target',
-          message: `"${goal.title}" has under a month left and still needs ${formatMoney(remaining)}!`
-        })
-      }
-    })
-
-    return list
-  }, [goals])
-
-  const activeAlerts = alerts.filter(a => !dismissed.includes(a.id))
-  const dismissAlert = (id) => setDismissed(prev => [...prev, id])
-
-  return { alerts: activeAlerts, dismissAlert }
+  return {
+    alerts: activeAlerts,
+    dismissAlert,
+    resetDismissed,
+    isBannerOpen,
+    riskFilter,
+    setRiskFilter,
+    dismissedCount: dismissedIds.length
+  }
 }
