@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 
 // Member 1 imports
 import Member1Layout from './member1/components/Member1Layout'
@@ -16,6 +16,7 @@ import SplitwisePage from './member3/pages/SplitwisePage'
 // Member 4 imports
 import GoalsPage4 from './member4/pages/GoalsPage4'
 import GoalDetailsPage4 from './member4/pages/GoalDetailsPage4'
+import { GoalsProvider4 } from './member4/context/GoalsContext4'
 
 function App() {
   return (
@@ -31,8 +32,18 @@ function App() {
           <Route path="subscriptions" element={<SubscriptionsPage2 />} />
           <Route path="profile" element={<ProfilePage2 />} />
           <Route path="splitwise" element={<SplitwisePage />} />
-          <Route path="goals" element={<GoalsPage4 />} />
-          <Route path="goals/:id" element={<GoalDetailsPage4 />} />
+
+          {/* Member 4 Routes wrapped in shared GoalsProvider4 */}
+          <Route
+            element={
+              <GoalsProvider4>
+                <Outlet />
+              </GoalsProvider4>
+            }
+          >
+            <Route path="goals" element={<GoalsPage4 />} />
+            <Route path="goals/:id" element={<GoalDetailsPage4 />} />
+          </Route>
         </Route>
 
         {/* Dedicated direct /subscriptions route */}

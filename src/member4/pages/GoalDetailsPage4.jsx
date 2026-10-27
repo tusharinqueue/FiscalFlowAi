@@ -21,6 +21,7 @@ function GoalDetailsPage4Base() {
   const [depositErrors, setDepositErrors] = useState({})
   const [depositTouched, setDepositTouched] = useState({})
   const [simRate, setSimRate] = useState(500)
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
   useEffect(() => {
     const found = getGoalById(id)
@@ -41,9 +42,18 @@ function GoalDetailsPage4Base() {
       return g.timeframeUnit === 'years' ? Number(g.timeframeValue) * 12 : Number(g.timeframeValue)
     }
     if (!g.deadline) return 0
-    const endDate = new Date(g.deadline)
+    const parts = g.deadline.split('-').map(Number)
+    let endDate
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      endDate = new Date(parts[0], parts[1] - 1, parts[2])
+    } else {
+      endDate = new Date(g.deadline)
+    }
     const today = new Date()
-    return (endDate.getFullYear() - today.getFullYear()) * 12 + (endDate.getMonth() - today.getMonth())
+    today.setHours(0, 0, 0, 0)
+    if (endDate <= today) return 0
+    const diffDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24))
+    return Math.max(1, Math.ceil(diffDays / 30.44))
   }
 
   const monthsRemaining = getMonthsRemaining(goal)
@@ -64,7 +74,20 @@ function GoalDetailsPage4Base() {
   const { alerts } = useAlerts4(goal ? [goal] : [])
   const goalAlert = alerts[0]
 
-  if (!goal) return <div className="goals-container" style={{paddingTop: '50px', textAlign: 'center'}}>Goal not found.</div>
+  if (!goal) {
+    return (
+      <div className="goals-container" style={{ paddingTop: '60px', textAlign: 'center' }}>
+        <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎯</div>
+        <h2 style={{ marginBottom: '8px' }}>Goal Not Found</h2>
+        <p style={{ color: '#8899bb', marginBottom: '24px' }}>
+          This goal may have been removed or does not exist.
+        </p>
+        <Link to="/goals" className="m4-btn m4-btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <span>←</span> Back to Goals
+        </Link>
+      </div>
+    )
+  }
 
   // Milestone Stepper progression checkpoints
   const milestones = [
@@ -77,6 +100,7 @@ function GoalDetailsPage4Base() {
   // Predictive Simulator Calculations
   const monthsNeeded = simRate > 0 && remaining > 0 ? Math.ceil(remaining / simRate) : 0
   const projectedDate = new Date()
+  projectedDate.setDate(1)
   projectedDate.setMonth(projectedDate.getMonth() + monthsNeeded)
   const completionDateText = isCompleted ? 'Completed' : (monthsNeeded > 0 ? projectedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Now')
   const dailyRate = Math.ceil(simRate / 30)
@@ -136,12 +160,9 @@ function GoalDetailsPage4Base() {
     }
   }
 
-  const handleDelete = () => {
-    if (window.confirm('Are you sure you want to delete this goal?')) {
-      // CONTEXT API: Dispatch delete action
-      deleteGoal(goal.id)
-      navigate('/goals')
-    }
+  const handleConfirmDelete = () => {
+    deleteGoal(goal.id)
+    navigate('/goals')
   }
 
   let timeDisplay = goal.timeframeValue
@@ -414,8 +435,25 @@ function GoalDetailsPage4Base() {
             )}
           </div>
 
-          <div style={{marginTop: 'auto', textAlign: 'right'}}>
-            <Button4 variant="danger" onClick={handleDelete}>Delete Goal</Button4>
+          {/* Delete Action with Robust Inline Confirmation (no blocked window.confirm) */}
+          <div style={{marginTop: 'auto', textAlign: 'right', paddingTop: '16px'}}>
+            {isConfirmingDelete ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                <span style={{ fontSize: '12px', color: '#f87171' }}>Permanently delete this goal?</span>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <Button4 variant="danger" onClick={handleConfirmDelete}>
+                    Yes, Delete
+                  </Button4>
+                  <Button4 variant="secondary" onClick={() => setIsConfirmingDelete(false)}>
+                    Cancel
+                  </Button4>
+                </div>
+              </div>
+            ) : (
+              <Button4 variant="danger" onClick={() => setIsConfirmingDelete(true)}>
+                Delete Goal
+              </Button4>
+            )}
           </div>
         </div>
       </div>
@@ -423,5 +461,6 @@ function GoalDetailsPage4Base() {
   )
 }
 
-// Wrap with React Context Provider
-export default withGoalsProvider(GoalDetailsPage4Base)
+// Wrap with React Context Provider for standalone resilience
+const GoalDetailsPage4 = withGoalsProvider(GoalDetailsPage4Base)
+export default GoalDetailsPage4

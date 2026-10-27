@@ -45,7 +45,13 @@ export function validateGoalForm(values) {
 
   // 4. Target Deadline validation (optional, but cannot be past date if set)
   if (values.deadline) {
-    const selected = new Date(values.deadline)
+    const parts = values.deadline.split('-').map(Number)
+    let selected
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      selected = new Date(parts[0], parts[1] - 1, parts[2])
+    } else {
+      selected = new Date(values.deadline)
+    }
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     if (isNaN(selected.getTime())) {

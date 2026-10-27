@@ -398,5 +398,6 @@ function GoalsPage4Base() {
   )
 }
 
-// Wrap with React Context Provider
-export default withGoalsProvider(GoalsPage4Base)
+// Wrap with React Context Provider for standalone resilience
+const GoalsPage4 = withGoalsProvider(GoalsPage4Base)
+export default GoalsPage4

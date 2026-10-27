@@ -20,8 +20,18 @@ export const GoalsContext4 = createContext(null)
 /**
  * 2. React Context Provider Component
  * Holds and broadcasts the global goals state architecture to all member4 consumers.
+ * If already wrapped in an ancestor GoalsProvider4, passes through to avoid state fragmentation.
  */
 export function GoalsProvider4({ children }) {
+  const existing = useContext(GoalsContext4)
+  if (existing) {
+    return <>{children}</>
+  }
+
+  return <GoalsProvider4Internal>{children}</GoalsProvider4Internal>
+}
+
+function GoalsProvider4Internal({ children }) {
   const [goals, setGoals] = useLocalStorage4('m4-goals', INITIAL_GOALS)
 
   // Computed global state
@@ -116,11 +126,13 @@ export function useGoals4() {
  * Higher-Order Component to guarantee GoalsProvider wrapping
  */
 export function withGoalsProvider(Component) {
-  return function WrappedComponent(props) {
+  function WrappedComponent(props) {
     return (
       <GoalsProvider4>
         <Component {...props} />
       </GoalsProvider4>
     )
   }
+  WrappedComponent.displayName = `WithGoalsProvider(${Component.displayName || Component.name || 'Component'})`
+  return WrappedComponent
 }
