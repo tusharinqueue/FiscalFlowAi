@@ -1,3 +1,4 @@
+// Ye reusable Button component hai jisme alag-alag button styles (primary, danger, preset) aur loading spinner function hai
 import React from 'react'
 
 export default function Button4({ type = 'button', variant = 'primary', onClick, disabled = false, isLoading = false, children, icon = null, className = '', title = '' }) {

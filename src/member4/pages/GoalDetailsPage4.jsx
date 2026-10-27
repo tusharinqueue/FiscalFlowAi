@@ -1,3 +1,4 @@
+// Ye goal detail page hai jo ek goal ki poori info dikhata hai (milestone stepper, what-if simulator, investment recommendations, deposit form aur delete action)
 import React, { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useGoals4, withGoalsProvider } from '../context/GoalsContext4'

@@ -1,3 +1,4 @@
+// Ye custom hook Zustand store ko connect karta hai taaki components me alerts easily display aur dismiss ho sakein
 import { useAlertsStore4 } from '../store/useAlertsStore4'
 
 export function useAlerts4(goals = []) {

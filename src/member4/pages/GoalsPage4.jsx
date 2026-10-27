@@ -1,3 +1,4 @@
+// Ye main Goals dashboard page hai jo saare goals dikhata hai, naya goal create karta hai, summary metrics aur smart risk alerts filter karta hai
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useGoals4, withGoalsProvider } from '../context/GoalsContext4'

@@ -1,3 +1,4 @@
+// Ye file React Context API provide karti hai global goals state manage karne ke liye (add goal, update, delete aur deposit actions)
 import React, { createContext, useContext } from 'react'
 import { useLocalStorage4 } from '../hooks/useLocalStorage4'
 

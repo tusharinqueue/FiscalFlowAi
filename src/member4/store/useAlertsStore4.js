@@ -1,3 +1,4 @@
+// Ye file Zustand store hai jo smart risk alerts manage karti hai (alerts generate karna, dismiss karna aur filter karna jaise urgent, overdue ya celebration)
 import { create } from 'zustand'
 
 export const useAlertsStore4 = create((set, get) => ({

@@ -1,3 +1,4 @@
+// Ye utility file form validation handle karti hai (required fields, positive amount check karna aur past deadline dates ko rokna)
 export function validateGoalForm(values) {
   const errors = {}
 

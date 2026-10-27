@@ -1,3 +1,4 @@
+// Ye custom hook data ko browser ke localStorage me synchronously save aur load karta hai taaki page reload par data persist rahe
 import { useState, useEffect, useCallback } from 'react'
 
 export function useLocalStorage4(key, initial) {

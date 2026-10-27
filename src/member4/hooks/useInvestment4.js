@@ -1,3 +1,4 @@
+// Ye custom hook async market investment rates fetch karta hai loading spinner, error handling aur retry function ke saath
 import { useState, useEffect, useCallback } from 'react'
 
 export function useInvestment4(goal, monthsRemaining, isCompleted) {
