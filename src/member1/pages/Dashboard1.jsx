@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../../shared/hooks/useAuth'
 import { useTransactions } from '../../shared/hooks/useTransactions'
 import '../styles/theme1.css'
 import '../styles/dash1.css'
@@ -54,7 +55,9 @@ function getTodayDate() {
 }
 
 // Main Component 
-export default function Dashboard1({ user }) {
+// user is now read directly from AuthContext – no prop needed
+export default function Dashboard1() {
+  const { user } = useAuth()
   // Consume authoritative transactions and summary metrics from TransactionsContext
   const {
     transactions,

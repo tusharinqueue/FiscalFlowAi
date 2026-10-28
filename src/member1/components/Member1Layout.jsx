@@ -1,6 +1,6 @@
 // Member1Layout.jsx – Shared layout wrapper for the member1 section
 // Handles: login gate, theme toggle, navbar, and page wrapper
-// Transactions state is NO longer here – each page manages its own state.
+// user is now accessed directly from AuthContext in each component – no prop drilling needed.
 
 import { Outlet, Navigate } from 'react-router-dom'
 import { useAuth } from '../../shared/hooks/useAuth'
@@ -24,15 +24,15 @@ export default function Member1Layout() {
   return (
     <>
       {/* Sticky top navbar with theme toggle and user avatar */}
-      <Navbar1 theme={theme} onToggleTheme={toggleTheme} user={user} />
+      <Navbar1 theme={theme} onToggleTheme={toggleTheme} />
 
       {/* Page content area */}
       <div className="m1-page-wrapper">
         {/*
           Outlet renders the matched child route (DashboardPage1 or TransactionsPage1).
-          We pass user via context so child pages can use it (e.g. for greeting).
+          No user prop is passed via context – each page reads from AuthContext directly.
         */}
-        <Outlet context={{ user }} />
+        <Outlet />
       </div>
     </>
   )

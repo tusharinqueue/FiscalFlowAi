@@ -1,9 +1,12 @@
 // Navbar1.jsx – Responsive navigation for FiscalFlow AI
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../../shared/hooks/useAuth'
 import ThemeToggle1 from './ThemeToggle1'
 import '../styles/navbar1.css'
 
-export default function Navbar1({ theme, onToggleTheme, user }) {
+// user is now read directly from AuthContext – no prop needed
+export default function Navbar1({ theme, onToggleTheme }) {
+  const { user } = useAuth()
   const { pathname } = useLocation()
   const initials = user?.name
     ? user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
